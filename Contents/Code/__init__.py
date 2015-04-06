@@ -41,7 +41,6 @@ def MainMenu():
 
 	return oc
 
-@handler('video/kijk/gemist', NAME)
 def gemist(channel):
 
 	oc = ObjectContainer()
@@ -59,7 +58,6 @@ def gemist(channel):
 
 	return oc
 
-@handler('video/kijk/gemistDay', NAME)
 def gemistForDay(channel, day):
 	oc = ObjectContainer()
 
