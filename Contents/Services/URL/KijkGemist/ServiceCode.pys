@@ -21,7 +21,8 @@ def MetadataObjectForURL(url):
 	if not subtitle.startswith('Aflevering'):
 		title = title+': '+subtitle
 
-	summary = html.xpath('//div[@class="synopsis"]/p[@itemprop="description"]//text()')[0]
+	try: summary = html.xpath('//div[@class="synopsis"]/p[@itemprop="description"]//text()')[0]
+	except: summary = ''
 	#try: genre = html.xpath('//div[@class="description"]//span[@itemprop="genre"]//text()')[0]
 	#except: genre = ''
 
