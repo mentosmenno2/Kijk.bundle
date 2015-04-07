@@ -87,9 +87,8 @@ def gemist(channel):
 def gemistForDay(channel, day):
 
 	html = HTTP.Request('http://www.kijk.nl/ajax/section/overview/missed_MissedChannel-'+channel).content.split('<hr>')[int(day)]
-	html = HTML.ElementFromString(html)
 
-	return ListRows(html)
+	return ListRows(HTML.ElementFromString(html))
 
 ####################################################################################################
 @route(PREFIX + '/meestBekeken')
@@ -122,10 +121,7 @@ def AtoZ():
 @route(PREFIX + '/ListRowsFromAJAX')
 def ListRowsFromAJAX(path):
 
-	html = HTTP.Request('http://www.kijk.nl/ajax/section/overview/'+path).content
-	html = HTML.ElementFromString(html)
-
-	return ListRows(html)
+	return ListRows(HTML.ElementFromURL('http://www.kijk.nl/ajax/section/overview/'+path))
 
 ####################################################################################################
 def ListRows(html):
