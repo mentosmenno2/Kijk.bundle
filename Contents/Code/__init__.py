@@ -32,8 +32,10 @@ def Start():
 	ObjectContainer.title1 = NAME
 	ObjectContainer.art = R(ART)
 
+	DirectoryObject.thumb = R(ICON)
+
 ####################################################################################################
-@handler(PREFIX, NAME)
+@handler(PREFIX, NAME, thumb=ICON, art=ART)
 def MainMenu():
 
 	oc = ObjectContainer()
@@ -65,7 +67,7 @@ def MainMenu():
 @route(PREFIX + '/gemist')
 def gemist():
 
-	oc = ObjectContainer()
+	oc = ObjectContainer(title2='Gemist')
 
 	for channel in CHANNELS:
 		oc.add(DirectoryObject(
@@ -80,7 +82,7 @@ def gemist():
 @route(PREFIX + '/gemistForChannel')
 def gemistForChannel(channel):
 
-	oc = ObjectContainer()
+	oc = ObjectContainer(title2=(item['name'] for item in CHANNELS if item["slug"] == channel).next())
 
 	html = HTML.ElementFromURL('http://www.kijk.nl/ajax/section/overview/missed_MissedChannel-'+channel)
 
@@ -90,55 +92,55 @@ def gemistForChannel(channel):
 		oc.add(DirectoryObject(
 			title = day.title(),
 			thumb = R(channel+'.png'),
-			key = Callback(gemistForDay, channel=channel, day=i)
+			key = Callback(gemistForDay, channel=channel, day=i, dayName=day.title())
 		))
 
 	return oc
 
 ####################################################################################################
 @route(PREFIX + '/gemistForDay')
-def gemistForDay(channel, day):
+def gemistForDay(channel, day, dayName):
 
 	html = HTTP.Request('http://www.kijk.nl/ajax/section/overview/missed_MissedChannel-'+channel).content.split('<hr>')[int(day)]
 
-	return ListRows(HTML.ElementFromString(html))
+	return ListRows(HTML.ElementFromString(html), title2=dayName)
 
 ####################################################################################################
 @route(PREFIX + '/meestBekeken')
 def meestBekeken():
 
-	return ListRowsFromAJAX('home_Episodes-popular/1/20')
+	return ListRowsFromAJAX('home_Episodes-popular/1/20', title2='Meest Bekeken')
 
 ####################################################################################################
 @route(PREFIX + '/kijkEerder')
 def kijkEerder():
 
-	return ListRowsFromAJAX('future_Future')
+	return ListRowsFromAJAX('future_Future', title2='Kijk Eerder')
 
 ####################################################################################################
 @route(PREFIX + '/AtoZ')
 def AtoZ():
 
-	oc = ObjectContainer()
+	oc = ObjectContainer(title2='A-Z')
 
 	for i in range(0, len(AZ)):
 		oc.add(DirectoryObject(
 			title = AZ[i],
 			thumb = R(ICON),
-			key = Callback(ListRowsFromAJAX, path='series_Series-abc-'+AZ[i])
+			key = Callback(ListRowsFromAJAX, path='series_Series-abc-'+AZ[i], title2=AZ[i])
 		))
 
 	return oc
 
 ####################################################################################################
 @route(PREFIX + '/ListRowsFromAJAX')
-def ListRowsFromAJAX(path, FallbackIcon=''):
+def ListRowsFromAJAX(path, FallbackIcon='', title2=''):
 
-	return ListRows(HTML.ElementFromURL('http://www.kijk.nl/ajax/section/overview/'+path), FallbackIcon)
+	return ListRows(HTML.ElementFromURL('http://www.kijk.nl/ajax/section/overview/'+path), FallbackIcon, title2)
 
 ####################################################################################################
-def ListRows(html, FallbackIcon=''):
-	oc = ObjectContainer()
+def ListRows(html, FallbackIcon='', title2=''):
+	oc = ObjectContainer(title2=title2)
 	elements = html.xpath('//div[a/div/@class="info "]')
 
 	for e in elements:
@@ -158,7 +160,7 @@ def ListRows(html, FallbackIcon=''):
 			channel = url.split('/')[1]
 			series = url.split('/')[2]
 
-			url = Callback(ListRowsFromAJAX, path='series-'+series+'.'+channel+'_Episodes-serie/1/200', FallbackIcon=thumb)
+			url = Callback(ListRowsFromAJAX, path='series-'+series+'.'+channel+'_Episodes-serie/1/500', FallbackIcon=thumb, title2=title)
 
 			oc.add(DirectoryObject(
 				title = title,
