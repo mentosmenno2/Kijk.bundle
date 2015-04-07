@@ -1,6 +1,7 @@
-NAME = 'KIJK'
-ICON = 'icon-default.png'
-ART  = 'art-default.jpg'
+NAME   = 'KIJK'
+ICON   = 'icon-default.png'
+ART    = 'art-default.jpg'
+PREFIX = '/video/kijk'
 
 CHANNELS = [
 	{
@@ -21,6 +22,10 @@ CHANNELS = [
 	}
 ]
 
+import string
+AZ = string.ascii_uppercase
+RE_SERIES = 'http://kijk.nl/(.*?)/(.*?)'
+
 ####################################################################################################
 def Start():
 
@@ -28,7 +33,7 @@ def Start():
 	ObjectContainer.art = R(ART)
 
 ####################################################################################################
-@handler('/video/kijk', NAME)
+@handler(PREFIX, NAME)
 def MainMenu():
 
 	#return channels()
@@ -50,10 +55,16 @@ def MainMenu():
 			thumb = R(ICON),
 			key = Callback(kijkEerder)
 	))
+	oc.add(DirectoryObject(
+			title = 'A-Z',
+			thumb = R(ICON),
+			key = Callback(AtoZ)
+	))
 
 	return oc
 
 ####################################################################################################
+@route(PREFIX + '/gemist')
 def gemist(channel):
 
 	oc = ObjectContainer()
@@ -72,24 +83,43 @@ def gemist(channel):
 	return oc
 
 ####################################################################################################
+@route(PREFIX + '/gemistForDay')
 def gemistForDay(channel, day):
 
-	html = HTTP.Request('http://www.kijk.nl/ajax/section/overview/missed_MissedChannel-'+channel).content.split('<hr>')[day]
+	html = HTTP.Request('http://www.kijk.nl/ajax/section/overview/missed_MissedChannel-'+channel).content.split('<hr>')[int(day)]
 	html = HTML.ElementFromString(html)
 
 	return ListRows(html)
 
 ####################################################################################################
+@route(PREFIX + '/meestBekeken')
 def meestBekeken():
 
 	return ListRowsFromAJAX('home_Episodes-popular/1/20')
 
 ####################################################################################################
+@route(PREFIX + '/kijkEerder')
 def kijkEerder():
 
 	return ListRowsFromAJAX('future_Future')
 
 ####################################################################################################
+@route(PREFIX + '/AtoZ')
+def AtoZ():
+
+	oc = ObjectContainer()
+
+	for i in range(0, len(AZ)):
+		oc.add(DirectoryObject(
+			title = AZ[i],
+			thumb = R(ICON),
+			key = Callback(ListRowsFromAJAX, path='series_Series-abc-'+AZ[i])
+		))
+
+	return oc
+
+####################################################################################################
+@route(PREFIX + '/ListRowsFromAJAX')
 def ListRowsFromAJAX(path):
 
 	html = HTTP.Request('http://www.kijk.nl/ajax/section/overview/'+path).content
@@ -103,21 +133,35 @@ def ListRows(html):
 	elements = html.xpath('//div[a/div/@class="info "]')
 
 	for e in elements:
-		subtitle = e.xpath('./div/div/div[@class="title"]/text()')[0]
+		try: subtitle = e.xpath('./div/div/div[@class="title"]/text()')[0]
+		except: subtitle = ''
+
 		title = e.xpath('./a/div/h3//text()')[0].strip()
-		if len(subtitle.strip()) > 0:
+		if len(subtitle.strip()) > 0 and title != subtitle:
 			title = title+': '+subtitle
 
 		thumb = Resource.ContentsOfURLWithFallback(e.xpath('./a/div/img[@itemprop="thumbnailUrl"]//@data-src')[0])
-		url = 'http://kijk.nl'+e.xpath('./a[@itemprop="url"]//@href')[0]
+		url = e.xpath('./a[@itemprop="url"]//@href')[0]
 
-		oc.add(VideoClipObject(
-			title = title,
-			thumb = thumb,
-			url = url
-		))
+		if len(url.split('/')) == 3:
+			channel = url.split('/')[1]
+			series = url.split('/')[2]
+
+			url = Callback(ListRowsFromAJAX, path='series-'+series+'.'+channel+'_Episodes-serie/1/200')
+
+			oc.add(DirectoryObject(
+				title = title,
+				thumb = thumb,
+				key = url
+			))
+		else:
+			oc.add(VideoClipObject(
+				title = title,
+				thumb = thumb,
+				url = 'http://kijk.nl'+url
+			))
 
 	if len(oc) > 0:
 		return oc
 	else:
-		return MessageContainer("Geen shows beschikbaar", "Er zijn geen shows beschikbaar")
+		return MessageContainer("Geen afleveringen beschikbaar", "Er zijn geen afleveringen beschikbaar")
