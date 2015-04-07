@@ -31,13 +31,25 @@ def Start():
 @handler('/video/kijk', NAME)
 def MainMenu():
 
+	#return channels()
 	oc = ObjectContainer()
+
 	for channel in CHANNELS:
 		oc.add(DirectoryObject(
 			title = channel['name'],
 			thumb = R(channel['slug']+'.png'),
 			key = Callback(gemist, channel=channel['slug'])
 		))
+	oc.add(DirectoryObject(
+			title = 'Meest Bekeken',
+			thumb = R(ICON),
+			key = Callback(meestBekeken)
+	))
+	oc.add(DirectoryObject(
+			title = 'Kijk Eerder',
+			thumb = R(ICON),
+			key = Callback(kijkEerder)
+	))
 
 	return oc
 
@@ -59,10 +71,30 @@ def gemist(channel):
 	return oc
 
 def gemistForDay(channel, day):
-	oc = ObjectContainer()
 
 	html = HTTP.Request('http://www.kijk.nl/ajax/section/overview/missed_MissedChannel-'+channel).content.split('<hr>')[day]
 	html = HTML.ElementFromString(html)
+
+	return ListRows(html)
+
+def meestBekeken():
+
+	return ListRowsFromAJAX('home_Episodes-popular/1/20')
+
+def kijkEerder():
+
+	return ListRowsFromAJAX('future_Future')
+
+
+def ListRowsFromAJAX(path):
+
+	html = HTTP.Request('http://www.kijk.nl/ajax/section/overview/'+path).content
+	html = HTML.ElementFromString(html)
+
+	return ListRows(html)
+
+def ListRows(html):
+	oc = ObjectContainer()
 	elements = html.xpath('//div[a/div/@class="info "]')
 
 	for e in elements:
@@ -80,4 +112,7 @@ def gemistForDay(channel, day):
 			url = url
 		))
 
-	return oc
+	if len(oc) > 0:
+		return oc
+	else:
+		return MessageContainer("Geen shows beschikbaar", "Er zijn geen shows beschikbaar")
