@@ -36,15 +36,13 @@ def Start():
 @handler(PREFIX, NAME)
 def MainMenu():
 
-	#return channels()
 	oc = ObjectContainer()
 
-	for channel in CHANNELS:
-		oc.add(DirectoryObject(
-			title = channel['name'],
-			thumb = R(channel['slug']+'.png'),
-			key = Callback(gemist, channel=channel['slug'])
-		))
+	oc.add(DirectoryObject(
+			title = 'Gemist',
+			thumb = R(ICON),
+			key = Callback(gemist)
+	))
 	oc.add(DirectoryObject(
 			title = 'Meest Bekeken',
 			thumb = R(ICON),
@@ -65,7 +63,22 @@ def MainMenu():
 
 ####################################################################################################
 @route(PREFIX + '/gemist')
-def gemist(channel):
+def gemist():
+
+	oc = ObjectContainer()
+
+	for channel in CHANNELS:
+		oc.add(DirectoryObject(
+			title = channel['name'],
+			thumb = R(channel['slug']+'.png'),
+			key = Callback(gemistForChannel, channel=channel['slug'])
+		))
+
+	return oc
+
+####################################################################################################
+@route(PREFIX + '/gemistForChannel')
+def gemistForChannel(channel):
 
 	oc = ObjectContainer()
 
@@ -119,12 +132,12 @@ def AtoZ():
 
 ####################################################################################################
 @route(PREFIX + '/ListRowsFromAJAX')
-def ListRowsFromAJAX(path):
+def ListRowsFromAJAX(path, FallbackIcon=''):
 
-	return ListRows(HTML.ElementFromURL('http://www.kijk.nl/ajax/section/overview/'+path))
+	return ListRows(HTML.ElementFromURL('http://www.kijk.nl/ajax/section/overview/'+path), FallbackIcon)
 
 ####################################################################################################
-def ListRows(html):
+def ListRows(html, FallbackIcon=''):
 	oc = ObjectContainer()
 	elements = html.xpath('//div[a/div/@class="info "]')
 
@@ -136,14 +149,16 @@ def ListRows(html):
 		if len(subtitle.strip()) > 0 and title != subtitle:
 			title = title+': '+subtitle
 
-		thumb = Resource.ContentsOfURLWithFallback(e.xpath('./a/div/img[@itemprop="thumbnailUrl"]//@data-src')[0])
+		try: thumb = Resource.ContentsOfURLWithFallback(e.xpath('./a/div/img[@itemprop="thumbnailUrl"]//@data-src')[0])
+		except: thumb = FallbackIcon
+
 		url = e.xpath('./a[@itemprop="url"]//@href')[0]
 
 		if len(url.split('/')) == 3:
 			channel = url.split('/')[1]
 			series = url.split('/')[2]
 
-			url = Callback(ListRowsFromAJAX, path='series-'+series+'.'+channel+'_Episodes-serie/1/200')
+			url = Callback(ListRowsFromAJAX, path='series-'+series+'.'+channel+'_Episodes-serie/1/200', FallbackIcon=thumb)
 
 			oc.add(DirectoryObject(
 				title = title,
