@@ -140,6 +140,7 @@ def ListRowsFromAJAX(path, FallbackIcon='', title2=''):
 
 ####################################################################################################
 def ListRows(html, FallbackIcon='', title2=''):
+
 	oc = ObjectContainer(title2=title2)
 	elements = html.xpath('//div[a/div/@class="info "]')
 
@@ -177,4 +178,4 @@ def ListRows(html, FallbackIcon='', title2=''):
 	if len(oc) > 0:
 		return oc
 	else:
-		return MessageContainer("Geen afleveringen beschikbaar", "Er zijn geen afleveringen beschikbaar")
+		return ObjectContainer(header="Geen afleveringen beschikbaar", message="Er zijn geen afleveringen beschikbaar")
