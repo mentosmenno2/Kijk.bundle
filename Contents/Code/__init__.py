@@ -34,6 +34,9 @@ def Start():
 
 	DirectoryObject.thumb = R(ICON)
 
+	HTTP.CacheTime = CACHE_1HOUR
+	HTTP.Headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.152 Safari/537.36'
+
 ####################################################################################################
 @handler(PREFIX, NAME, thumb=ICON, art=ART)
 def MainMenu():
