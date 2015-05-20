@@ -8,8 +8,7 @@
 		<dict>
 			<key>URLPatterns</key>
 			<array>
-				<string>^http:\/\/kijk.nl\/.+\/.+\/.+\/.+\/.+</string>
-				<string>^http:\/\/www.kijk.nl\/.+\/.+\/.+\/.+\/.+</string>
+				<string>^http:\/\/(www\.)?kijk\.nl\/.+\/.+\/.+\/.+\/.+</string>
 			</array>
 		</dict>
 	</dict>
