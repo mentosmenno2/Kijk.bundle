@@ -1,6 +1,5 @@
 RE_JSON = Regex('var experienceJSON = {(.*?)};')
 
-import urllib2
 ####################################################################################################
 def MetadataObjectForURL(url):
 
@@ -18,8 +17,8 @@ def MetadataObjectForURL(url):
 		title = title.split(" - Seizoen")[0]
 	else:
 		season = 0
-	if not subtitle.startswith('Aflevering'):
-		title = title+': '+subtitle
+	if not 'Aflevering' in subtitle:
+		title = title+': '+subtitle.strip()
 
 	try: summary = html.xpath('//div[@class="synopsis"]/p[@itemprop="description"]//text()')[0]
 	except: summary = ''
@@ -52,7 +51,7 @@ def MediaObjectsForURL(url):
 	html = HTML.ElementFromURL(url)
 	burl = html.xpath('//meta[@name="video_src"]/@content')[0].replace('federated_f9','htmlFederated').replace('&videoId', '&videoPlayer').replace('&videoPlayer','&%40videoPlayer')
 
-	json = JSON.ObjectFromString(RE_JSON.search(urllib2.urlopen(burl).read()).group(0)[21:-1])
+	json = JSON.ObjectFromString(RE_JSON.search(HTTP.Request(burl).content).group(0)[21:-1])
 	json = json['data']['programmedContent']['videoPlayer']['mediaDTO']
 
 	#title = json['displayName']

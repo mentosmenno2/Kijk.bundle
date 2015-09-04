@@ -34,6 +34,9 @@ def Start():
 
 	DirectoryObject.thumb = R(ICON)
 
+	HTTP.CacheTime = CACHE_1HOUR
+	HTTP.Headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.152 Safari/537.36'
+
 ####################################################################################################
 @handler(PREFIX, NAME, thumb=ICON, art=ART)
 def MainMenu():
@@ -140,6 +143,7 @@ def ListRowsFromAJAX(path, FallbackIcon='', title2=''):
 
 ####################################################################################################
 def ListRows(html, FallbackIcon='', title2=''):
+
 	oc = ObjectContainer(title2=title2)
 	elements = html.xpath('//div[a/div/@class="info "]')
 
@@ -177,4 +181,4 @@ def ListRows(html, FallbackIcon='', title2=''):
 	if len(oc) > 0:
 		return oc
 	else:
-		return MessageContainer("Geen afleveringen beschikbaar", "Er zijn geen afleveringen beschikbaar")
+		return ObjectContainer(header="Geen afleveringen beschikbaar", message="Er zijn geen afleveringen beschikbaar")
