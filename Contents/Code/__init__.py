@@ -54,11 +54,6 @@ def MainMenu():
 			key = Callback(meestBekeken)
 	))
 	oc.add(DirectoryObject(
-			title = 'Kijk Eerder',
-			thumb = R(ICON),
-			key = Callback(kijkEerder)
-	))
-	oc.add(DirectoryObject(
 			title = 'A-Z',
 			thumb = R(ICON),
 			key = Callback(AtoZ)
@@ -113,12 +108,6 @@ def gemistForDay(channel, day, dayName):
 def meestBekeken():
 
 	return ListRowsFromAJAX('home_Episodes-popular/1/20', title2='Meest Bekeken')
-
-####################################################################################################
-@route(PREFIX + '/kijkEerder')
-def kijkEerder():
-
-	return ListRowsFromAJAX('future_Future', title2='Kijk Eerder')
 
 ####################################################################################################
 @route(PREFIX + '/AtoZ')
