@@ -119,7 +119,7 @@ def AtoZ():
 		oc.add(DirectoryObject(
 			title = AZ[i],
 			thumb = R(ICON),
-			key = Callback(ListRowsFromAJAX, path='series_Series-abc-'+AZ[i], title2=AZ[i])
+			key = Callback(ListRowsFromAJAX, path='programs-abc-'+AZ[i], title2=AZ[i])
 		))
 
 	return oc
