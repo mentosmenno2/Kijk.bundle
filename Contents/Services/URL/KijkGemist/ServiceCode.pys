@@ -31,7 +31,8 @@ def MetadataObjectForURL(url):
 	try: art = HTML.ElementFromURL(arturl).xpath('//div[@class="poster"]/div/img[@itemprop="thumbnailUrl"]//@data-src')[0]
 	except: art = ''
 
-	duration = int(html.xpath('//div[@class="description"]//span[@itemprop="timeRequired"]//text()')[0].split(' ')[0])*60000
+	try: duration = int(html.xpath('//div[@class="description"]//span[@itemprop="timeRequired"]//text()')[0].split(' ')[0])*60000
+	except: duration = None
 
 	return EpisodeObject(
 		title = title,
