@@ -5,7 +5,7 @@ import urllib2
 NAME   = 'KIJK'
 ICON   = 'icon-default.png'
 ART    = 'art-default.jpg'
-PREFIX = '/video/kijk'
+PREFIX = '/mentosmenno2/kijk'
 
 CHANNELS = [
 	{
@@ -158,10 +158,10 @@ def Episode(title2='', path=''):
 	videoUrl = ""
 	for s in sources:
 		if(s["container"] == "MP4"):
-			videoUrl = s["stream_name"]replace("mp4:", '')
-			videoUrlBase = 'https://vod-bc-prod-1.sbscdn.nl/'
-			if(!videoUrl.startswith(videoUrlBase)) :
-				videoUrl = videoUrlBase+videoUrl
+			videoUrl = s["stream_name"].replace("mp4:", '')
+			# videoUrlBase = "https://vod-bc-prod-1.sbscdn.nl/"
+			# if videoUrl.startswith(videoUrlBase) == False:
+			# 	videoUrl = videoUrlBase+videoUrl
 		break
 	return ObjectContainer(header="Video URL", message=videoUrl)
 
