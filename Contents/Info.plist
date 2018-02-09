@@ -3,10 +3,14 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleIdentifier</key>
-	<string>com.plexapp.plugins.kijk</string>
+	<string>com.mentosmenno2.kijk</string>
 	<key>PlexClientPlatforms</key>
 	<string>*</string>
 	<key>PlexFrameworkVersion</key>
 	<string>2</string>
+	<key>PlexPluginDebug</key>
+	<string>1</string>
+	<key>PlexPluginConsoleLogging</key>
+	<string>1</string>
 </dict>
 </plist>
