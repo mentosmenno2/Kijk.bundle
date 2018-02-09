@@ -78,7 +78,7 @@ def ProgramsList(title2=''):
 
 	oc = ObjectContainer(title2='Programmalijst')
 
-	jsonObj = getFromAPI(path='default/sections/programs-abc-'+DIGS+AZ_LOWER+'?limit=999&offset=0');
+	jsonObj = getFromAPI(path='default/sections/programs-abc-'+DIGS+AZ_LOWER+'?limit=999&offset=0')
 	elements = jsonObj["items"]
 
 	for e in elements:
@@ -114,7 +114,7 @@ def Program(title2='', path=''):
 
 	oc = ObjectContainer(title2=title2)
 
-	jsonObj = getFromAPI(path=path);
+	jsonObj = getFromAPI(path=path)
 	sections = jsonObj["sections"]
 	for s in sections:
 		if s["type"] == "horizontal-single":
@@ -152,7 +152,7 @@ def Episode(title2='', path=''):
 
 	oc = ObjectContainer(title2=title2)
 
-	jsonObj = getFromBrightcove(path=path); #https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/5574398508001
+	jsonObj = getFromBrightcove(path=path) #https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/5574398508001
 	sources = jsonObj["sources"]
 	# sources.sort(key = lambda obj: obj.avg_bitrate)
 	videoUrl = ""
@@ -180,7 +180,3 @@ def getFromBrightcove(path=''):
 	jsonObj = json.loads(receivedJson)
 	return jsonObj
 	#return JSON.ObjectFromURL(VIDEO_URL+path)
-
-####################################################################################################
-def sortByTitle(t):
-	return t["title"]
