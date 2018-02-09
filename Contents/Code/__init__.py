@@ -5,7 +5,7 @@ import urllib2
 NAME   = 'KIJK'
 ICON   = 'icon-default.png'
 ART    = 'art-default.jpg'
-PREFIX = '/mentosmenno2/kijk'
+PREFIX = '/video/kijk'
 
 CHANNELS = [
 	{
@@ -26,14 +26,16 @@ CHANNELS = [
 	}
 ]
 
-AZUPPER = string.ascii_uppercase
+AZ_UPPER = string.ascii_uppercase
 AZ_LOWER = string.ascii_lowercase
 DIGS = string.digits
+
 API_URL_V1 = 'https://api.kijk.nl/v1/'
 API_URL_V2 = 'https://api.kijk.nl/v2/'
 
 RE_SERIES = 'http://kijk.nl/(.*?)/(.*?)'
 VIDEO_URL = "https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/"
+
 
 ####################################################################################################
 def Start():
@@ -42,8 +44,6 @@ def Start():
 	ObjectContainer.art = R(ART)
 
 	DirectoryObject.thumb = R(ICON)
-
-	Plugin.AddViewGroup("Programs", viewMode="InfoList", mediaType="items")
 
 	HTTP.CacheTime = CACHE_1HOUR
 	HTTP.Headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.152 Safari/537.36'
@@ -54,16 +54,16 @@ def MainMenu():
 
 	oc = ObjectContainer()
 
-	# oc.add(DirectoryObject(
-	# 		title = 'Gemist',
-	# 		thumb = R(ICON),
-	# 		key = Callback(gemist)
-	# ))
-	# oc.add(DirectoryObject(
-	# 		title = 'Meest Bekeken',
-	# 		thumb = R(ICON),
-	# 		key = Callback(meestBekeken)
-	# ))
+	oc.add(DirectoryObject(
+			title = 'Gemist',
+			thumb = R(ICON),
+			key = ''
+	))
+	oc.add(DirectoryObject(
+			title = 'Meest Bekeken',
+			thumb = R(ICON),
+			key = ''
+	))
 	oc.add(DirectoryObject(
 			title = 'Programmalijst',
 			thumb = R(ICON),
