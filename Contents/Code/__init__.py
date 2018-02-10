@@ -78,12 +78,19 @@ def ProgramsList(title2=''):
 
 	oc = ObjectContainer(title2='Programmalijst')
 
-	jsonObj = getFromAPI(path='default/sections/programs-abc-'+DIGS+AZ_LOWER+'?limit=999&offset=0')
-	elements = jsonObj["items"]
+	try:
+		jsonObj = getFromAPI(path='default/sections/programs-abc-'+DIGS+AZ_LOWER+'?limit=999&offset=0')
+		elements = jsonObj["items"]
+	except:
+		return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van de programmalijst.")
 
 	for e in elements:
 		if e["available"]:
-			title = e["title"]
+			try: title = e["title"]
+			except: title = ''
+
+			try: summary = e["synopsis"]
+			except: summary = ''
 
 			try: thumb = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image"])
 			except: thumb = R(ICON)
@@ -91,12 +98,13 @@ def ProgramsList(title2=''):
 			try: art = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image_pdp_header"])
 			except: art = R(ART)
 
-			millis = int(e["duration"].replace(' min.', ''))*60*1000
+			try: millis = int(e["duration"].replace(' min.', ''))*60*1000
+			except: millis = 0
 
 			oc.add(DirectoryObject(
 				title = title,
 				thumb = thumb,
-				summary = e["synopsis"],
+				summary = summary,
 				art = art,
 				duration = millis,
 				key = Callback(Program, title2=title, path=e["_links"]["self"])
@@ -114,27 +122,46 @@ def Program(title2='', path=''):
 
 	oc = ObjectContainer(title2=title2)
 
-	jsonObj = getFromAPI(path=path)
-	sections = jsonObj["sections"]
+	try:
+		jsonObj = getFromAPI(path=path)
+		sections = jsonObj["sections"]
+	except:
+		return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van dit programma.")
+
 	for s in sections:
 		if s["type"] == "horizontal-single":
 			elements = s["items"]
 			for e in elements:
+				try: newPath = e["brightcoveId"]
+				except: continue
+
+				try: seasonLabelShort = e["seasonLabelShort"]
+				except: seasonLabelShort = ''
+
+				try: episode = e["episode"]
+				except: episode = ''
+
+				try: episodeLabel = e["episodeLabel"]
+				except: episodeLabel = ''
+
+				try: summary = e["synopsis"]
+				except: summary = ''
+
 				try: thumb = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image"])
 				except: thumb = R(ICON)
 
 				try: art = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image_pdp_header"])
 				except: art = R(ART)
 
-				try: newPath = e["brightcoveId"]
-				except: newPath = ''
+				try: millis = int(e["duration"].replace(' min.', ''))*60*1000
+				except: millis = 0
 
 				millis = int(e["duration"].replace(' min.', ''))*60*1000
 
 				oc.add(DirectoryObject(
-					title = e["seasonLabelShort"]+"E"+e["episode"]+": "+e["episodeLabel"],
+					title = seasonLabelShort+"E"+episode+": "+episodeLabel,
 					thumb = thumb,
-					summary = e["synopsis"],
+					summary = summary,
 					art = art,
 					duration = millis,
 					key = Callback(Episode, title2=e["episodeLabel"], path=newPath) #e["brightcoveId"]
@@ -152,17 +179,23 @@ def Episode(title2='', path=''):
 
 	oc = ObjectContainer(title2=title2)
 
-	jsonObj = getFromBrightcove(path=path) #https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/5574398508001
-	sources = jsonObj["sources"]
+	try:
+		jsonObj = getFromBrightcove(path=path) #https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/5574398508001
+		sources = jsonObj["sources"]
+	except:
+		return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van deze aflevering.")
+
 	# sources.sort(key = lambda obj: obj.avg_bitrate)
 	videoUrl = ""
-	for s in sources:
-		if(s["container"] == "MP4"):
-			videoUrl = s["stream_name"].replace("mp4:", '')
-			# videoUrlBase = "https://vod-bc-prod-1.sbscdn.nl/"
-			# if videoUrl.startswith(videoUrlBase) == False:
-			# 	videoUrl = videoUrlBase+videoUrl
-		break
+	try:
+		for s in sources:
+			if(s["container"] == "MP4"):
+				videoUrl = s["stream_name"].replace("mp4:", '')
+				videoUrlBase = "https://vod-bc-prod-1.sbscdn.nl/"
+				if not videoUrl.startswith(videoUrlBase):
+					videoUrl = videoUrlBase+videoUrl
+	except:
+		ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van de afleveringskwaliteit aflevering.")
 	return ObjectContainer(header="Video URL", message=videoUrl)
 
 ####################################################################################################
