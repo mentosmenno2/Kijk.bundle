@@ -8,9 +8,17 @@
 		<dict>
 			<key>URLPatterns</key>
 			<array>
-				<string>^http:\/\/(www\.)?kijk\.nl\/.*</string>
+				<string>^https:\/\/(www\.)?kijk\.nl\/.*</string>
 			</array>
 		</dict>
 	</dict>
+	<key>BrightCove</key>
+		<dict>
+			<key>URLPatterns</key>
+			<array>
+				<string>^https:\/\/(www\.)?edge\.api\.brightcove\.com\/playback\/accounts\/videos\/.+</string>
+				<!-- https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/ -->
+			</array>
+		</dict>
 </dict>
 </plist>

@@ -35,6 +35,7 @@ API_URL_V1 = 'https://api.kijk.nl/v1/'
 API_URL_V2 = 'https://api.kijk.nl/v2/'
 
 RE_SERIES = 'http://kijk.nl/(.*?)/(.*?)'
+KIJK_VIDEO_URL = "https://www.kijk.nl/video/"
 VIDEO_URL = "https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/"
 
 
@@ -176,6 +177,9 @@ def PopularList(title2=''):
 		return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van de populaire programma's.")
 
 	for e in elements:
+		try: newPath = +e["id"]
+		except: newPath = ''
+
 		try: newPath = e["brightcoveId"]
 		except: continue
 
@@ -201,13 +205,15 @@ def PopularList(title2=''):
 		try: millis = e["durationSeconds"]*1000
 		except: millis = 0
 
-		oc.add(DirectoryObject(
+		# oc.add(DirectoryObject(
+		oc.add(VideoClipObject(
 			title = title+" - "+seasonLabelShort+"E"+episode+": "+episodeLabel,
 			thumb = thumb,
 			summary = summary,
 			art = art,
 			duration = millis,
-			key = Callback(Episode, title2=episodeLabel, path=newPath) #e["brightcoveId"]
+			# key = Callback(Episode, title2=episodeLabel, path=newPath) #e["brightcoveId"]
+			url = VIDEO_URL+newPath
 		))
 
 	if len(oc) > 0:
