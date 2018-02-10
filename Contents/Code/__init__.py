@@ -63,10 +63,10 @@ def MainMenu():
 			#https://api.kijk.nl/v2/templates/page/missed/all/20180208
 	))
 	oc.add(DirectoryObject(
-			title = 'Meest Bekeken',
+			title = 'Populaire afleveringen',
 			thumb = R(ICON),
 			art = R(ART),
-			key = ''
+			key = Callback(PopularList, title2='Populaire afleveringen')
 			#https://api.kijk.nl/v2/default/sections/popular_PopularVODs
 	))
 	oc.add(DirectoryObject(
@@ -114,7 +114,7 @@ def MissedEpisodesList(title2='', path=''):
 		jsonObj = getFromAPI2(path=path)
 		components = jsonObj["components"]
 	except:
-		return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van dit programma.")
+		return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van de gemiste programma's.")
 
 	for c in components:
 		if c["type"] == "video_list":
@@ -158,7 +158,58 @@ def MissedEpisodesList(title2='', path=''):
 					key = Callback(Episode, title2=episodeLabel, path=newPath) #e["brightcoveId"]
 				))
 
-	oc.objects.sort(key = lambda obj: obj.title.lower())
+	if len(oc) > 0:
+		return oc
+	else:
+		return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden.")
+
+####################################################################################################
+@route(PREFIX + '/popularList')
+def PopularList(title2=''):
+
+	oc = ObjectContainer(title2=title2, art=R(ART))
+
+	try:
+		jsonObj = getFromAPI2(path='default/sections/popular_PopularVODs?limit=999&offset=0')
+		elements = jsonObj["items"]
+	except:
+		return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van de populaire programma's.")
+
+	for e in elements:
+		try: newPath = e["brightcoveId"]
+		except: continue
+
+		try: title = e["title"]
+		except: title = ''
+
+		try: seasonLabelShort = e["seasonLabelShort"]
+		except: seasonLabelShort = ''
+
+		try: episode = e["episode"]
+		except: episode = ''
+
+		try: episodeLabel = e["episodeLabel"]
+		except: episodeLabel = ''
+
+		try: summary = e["synopsis"]
+		except: summary = ''
+
+		thumb = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image"], R(ICON))
+
+		art = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image_pdp_header"], R(ART))
+
+		try: millis = e["durationSeconds"]*1000
+		except: millis = 0
+
+		oc.add(DirectoryObject(
+			title = title+" - "+seasonLabelShort+"E"+episode+": "+episodeLabel,
+			thumb = thumb,
+			summary = summary,
+			art = art,
+			duration = millis,
+			key = Callback(Episode, title2=episodeLabel, path=newPath) #e["brightcoveId"]
+		))
+
 	if len(oc) > 0:
 		return oc
 	else:
