@@ -1,6 +1,7 @@
 import string
 import json
 import urllib2
+import datetime
 
 NAME   = 'KIJK'
 ICON   = 'icon-default.png'
@@ -57,12 +58,14 @@ def MainMenu():
 	oc.add(DirectoryObject(
 			title = 'Gemist',
 			thumb = R(ICON),
-			key = ''
+			key = Callback(MissedDayList, title2='Gemist')
+			#https://api.kijk.nl/v2/templates/page/missed/all/20180208
 	))
 	oc.add(DirectoryObject(
 			title = 'Meest Bekeken',
 			thumb = R(ICON),
 			key = ''
+			#https://api.kijk.nl/v2/default/sections/popular_PopularVODs
 	))
 	oc.add(DirectoryObject(
 			title = 'Programmalijst',
@@ -73,16 +76,103 @@ def MainMenu():
 	return oc
 
 ####################################################################################################
+@route(PREFIX + '/missedDayList')
+def MissedDayList(title2='', path=''):
+
+	oc = ObjectContainer(title2=title2)
+	dayStrings = ["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag"]
+	now = datetime.datetime.today()
+	for index in range(0, 7):
+		dayDate = now - datetime.timedelta(index)
+		dayName = dayStrings[dayDate.weekday()]
+		dayPath = "templates/page/missed/all/"+dayDate.strftime("%Y%m%d")
+
+		if(index == 0):
+			dayName = 'Vandaag'
+		if(index == 1):
+			dayName = 'Gisteren'
+
+		oc.add(DirectoryObject(
+				title = dayName,
+				thumb = R(ICON),
+				key = Callback(MissedEpisodesList, title2=dayName, path=dayPath)
+		))
+
+	return oc
+
+####################################################################################################
+@route(PREFIX + '/missedEpisodesList')
+def MissedEpisodesList(title2='', path=''):
+
+	oc = ObjectContainer(title2=title2)
+
+	try:
+		jsonObj = getFromAPI2(path=path)
+		components = jsonObj["components"]
+	except:
+		return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van dit programma.")
+
+	for c in components:
+		if c["type"] == "video_list":
+			try:
+				elements = c["data"]["items"]
+			except:
+				return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden")
+
+			for e in elements:
+				try: newPath = e["brightcoveId"]
+				except: continue
+
+				try: title = e["title"]
+				except: title = ''
+
+				try: seasonLabelShort = e["seasonLabelShort"]
+				except: seasonLabelShort = ''
+
+				try: episode = e["episode"]
+				except: episode = ''
+
+				try: episodeLabel = e["episodeLabel"]
+				except: episodeLabel = ''
+
+				try: summary = e["synopsis"]
+				except: summary = ''
+
+				try: thumb = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image"])
+				except: thumb = R(ICON)
+
+				try: art = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image_pdp_header"])
+				except: art = R(ART)
+
+				try: millis = e["durationSeconds"]*1000
+				except: millis = 0
+
+				oc.add(DirectoryObject(
+					title = title+" - "+seasonLabelShort+"E"+episode+": "+episodeLabel,
+					thumb = thumb,
+					summary = summary,
+					art = art,
+					duration = millis,
+					key = Callback(Episode, title2=episodeLabel, path=newPath) #e["brightcoveId"]
+				))
+
+	oc.objects.sort(key = lambda obj: obj.title.lower())
+	if len(oc) > 0:
+		return oc
+	else:
+		return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden.")
+
+####################################################################################################
 @route(PREFIX + '/programsList')
 def ProgramsList(title2=''):
 
-	oc = ObjectContainer(title2='Programmalijst')
+	oc = ObjectContainer(title2=title2)
 
 	try:
 		jsonObj = getFromAPI(path='default/sections/programs-abc-'+DIGS+AZ_LOWER+'?limit=999&offset=0')
 		elements = jsonObj["items"]
 	except:
-		return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van de programmalijst.")
+		return ObjectContainer(title2='Programmalijst', header="Fout", message="Er is iets fout gegaan bij het ophalen van de programmalijst.")
 
 	for e in elements:
 		if e["available"]:
@@ -107,18 +197,18 @@ def ProgramsList(title2=''):
 				summary = summary,
 				art = art,
 				duration = millis,
-				key = Callback(Program, title2=title, path=e["_links"]["self"])
+				key = Callback(EpisodeList, title2=title, path=e["_links"]["self"])
 			))
 
 	oc.objects.sort(key = lambda obj: obj.title.lower())
 	if len(oc) > 0:
 		return oc
 	else:
-		return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden")
+		return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden.")
 
 ####################################################################################################
-@route(PREFIX + '/program')
-def Program(title2='', path=''):
+@route(PREFIX + '/episodeList')
+def EpisodeList(title2='', path=''):
 
 	oc = ObjectContainer(title2=title2)
 
@@ -130,7 +220,11 @@ def Program(title2='', path=''):
 
 	for s in sections:
 		if s["type"] == "horizontal-single":
-			elements = s["items"]
+			try:
+				elements = s["items"]
+			except:
+				return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden.")
+
 			for e in elements:
 				try: newPath = e["brightcoveId"]
 				except: continue
@@ -153,10 +247,8 @@ def Program(title2='', path=''):
 				try: art = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image_pdp_header"])
 				except: art = R(ART)
 
-				try: millis = int(e["duration"].replace(' min.', ''))*60*1000
+				try: millis = e["durationSeconds"]*1000
 				except: millis = 0
-
-				millis = int(e["duration"].replace(' min.', ''))*60*1000
 
 				oc.add(DirectoryObject(
 					title = seasonLabelShort+"E"+episode+": "+episodeLabel,
@@ -164,14 +256,14 @@ def Program(title2='', path=''):
 					summary = summary,
 					art = art,
 					duration = millis,
-					key = Callback(Episode, title2=e["episodeLabel"], path=newPath) #e["brightcoveId"]
+					key = Callback(Episode, title2=episodeLabel, path=newPath) #e["brightcoveId"]
 				))
 
 	oc.objects.sort(key = lambda obj: obj.title.lower())
 	if len(oc) > 0:
 		return oc
 	else:
-		return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden")
+		return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden.")
 
 ####################################################################################################
 @route(PREFIX + '/episode')
@@ -204,6 +296,13 @@ def getFromAPI(path=''):
 	#jsonObj = json.loads(receivedJson)
 	#return jsonObj
 	return JSON.ObjectFromURL(API_URL_V1+path)
+
+####################################################################################################
+def getFromAPI2(path=''):
+	#receivedJson = urllib.urlopen(API_URL_V1+path).read()
+	#jsonObj = json.loads(receivedJson)
+	#return jsonObj
+	return JSON.ObjectFromURL(API_URL_V2+path)
 
 ####################################################################################################
 def getFromBrightcove(path=''):
