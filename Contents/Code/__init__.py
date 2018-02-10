@@ -58,18 +58,21 @@ def MainMenu():
 	oc.add(DirectoryObject(
 			title = 'Gemist',
 			thumb = R(ICON),
+			art = R(ART),
 			key = Callback(MissedDayList, title2='Gemist')
 			#https://api.kijk.nl/v2/templates/page/missed/all/20180208
 	))
 	oc.add(DirectoryObject(
 			title = 'Meest Bekeken',
 			thumb = R(ICON),
+			art = R(ART),
 			key = ''
 			#https://api.kijk.nl/v2/default/sections/popular_PopularVODs
 	))
 	oc.add(DirectoryObject(
 			title = 'Programmalijst',
 			thumb = R(ICON),
+			art = R(ART),
 			key = Callback(ProgramsList, title2='Programmalijst')
 	))
 
@@ -95,6 +98,7 @@ def MissedDayList(title2='', path=''):
 		oc.add(DirectoryObject(
 				title = dayName,
 				thumb = R(ICON),
+				art = R(ART),
 				key = Callback(MissedEpisodesList, title2=dayName, path=dayPath)
 		))
 
@@ -104,7 +108,7 @@ def MissedDayList(title2='', path=''):
 @route(PREFIX + '/missedEpisodesList')
 def MissedEpisodesList(title2='', path=''):
 
-	oc = ObjectContainer(title2=title2)
+	oc = ObjectContainer(title2=title2, art=R(ART))
 
 	try:
 		jsonObj = getFromAPI2(path=path)
@@ -138,11 +142,9 @@ def MissedEpisodesList(title2='', path=''):
 				try: summary = e["synopsis"]
 				except: summary = ''
 
-				try: thumb = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image"])
-				except: thumb = R(ICON)
+				thumb = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image"], R(ICON))
 
-				try: art = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image_pdp_header"])
-				except: art = R(ART)
+				art = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image_pdp_header"], R(ART))
 
 				try: millis = e["durationSeconds"]*1000
 				except: millis = 0
@@ -166,13 +168,13 @@ def MissedEpisodesList(title2='', path=''):
 @route(PREFIX + '/programsList')
 def ProgramsList(title2=''):
 
-	oc = ObjectContainer(title2=title2)
+	oc = ObjectContainer(title2=title2, art=R(ART))
 
 	try:
 		jsonObj = getFromAPI(path='default/sections/programs-abc-'+DIGS+AZ_LOWER+'?limit=999&offset=0')
 		elements = jsonObj["items"]
 	except:
-		return ObjectContainer(title2='Programmalijst', header="Fout", message="Er is iets fout gegaan bij het ophalen van de programmalijst.")
+		return ObjectContainer(title2=title2, header="Fout", message="Er is iets fout gegaan bij het ophalen van de programmalijst.")
 
 	for e in elements:
 		if e["available"]:
@@ -182,11 +184,9 @@ def ProgramsList(title2=''):
 			try: summary = e["synopsis"]
 			except: summary = ''
 
-			try: thumb = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image"])
-			except: thumb = R(ICON)
+			thumb = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image"], R(ICON))
 
-			try: art = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image_pdp_header"])
-			except: art = R(ART)
+			art = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image_pdp_header"], R(ART))
 
 			try: millis = int(e["duration"].replace(' min.', ''))*60*1000
 			except: millis = 0
@@ -197,7 +197,7 @@ def ProgramsList(title2=''):
 				summary = summary,
 				art = art,
 				duration = millis,
-				key = Callback(EpisodeList, title2=title, path=e["_links"]["self"])
+				key = Callback(EpisodeList, title2=title, path=e["_links"]["self"], art=art)
 			))
 
 	oc.objects.sort(key = lambda obj: obj.title.lower())
@@ -208,9 +208,9 @@ def ProgramsList(title2=''):
 
 ####################################################################################################
 @route(PREFIX + '/episodeList')
-def EpisodeList(title2='', path=''):
+def EpisodeList(title2='', path='', art=R(ART)):
 
-	oc = ObjectContainer(title2=title2)
+	oc = ObjectContainer(title2=title2, art=art)
 
 	try:
 		jsonObj = getFromAPI(path=path)
@@ -241,11 +241,9 @@ def EpisodeList(title2='', path=''):
 				try: summary = e["synopsis"]
 				except: summary = ''
 
-				try: thumb = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image"])
-				except: thumb = R(ICON)
+				thumb = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image"], R(ICON))
 
-				try: art = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image_pdp_header"])
-				except: art = R(ART)
+				art = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image_pdp_header"], R(ART))
 
 				try: millis = e["durationSeconds"]*1000
 				except: millis = 0
