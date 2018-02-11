@@ -97,6 +97,7 @@ def MissedDayList(title2='', path=''):
 	for index in range(0, 7):
 		dayDate = now - datetime.timedelta(index)
 		dayName = dayStrings[dayDate.weekday()]
+		dayDateString = dayDate.strftime("%d-%m-%Y")
 		dayPath = "templates/page/missed/all/"+dayDate.strftime("%Y%m%d")
 
 		if(index == 0):
@@ -105,7 +106,7 @@ def MissedDayList(title2='', path=''):
 			dayName = L("YESTERDAY")
 
 		oc.add(DirectoryObject(
-				title = dayName,
+				title = dayName+": "+dayDateString,
 				thumb = R(ICON),
 				art = R(ART),
 				key = Callback(MissedEpisodesList, title2=dayName, path=dayPath)
@@ -134,6 +135,11 @@ def MissedEpisodesList(title2='', path=''):
 				return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
 			for e in elements:
+				try: available = e["available"]
+				except: available = False
+				if not available:
+					continue
+
 				try: newPath = BRIGHTCOVE_VIDEO_URL+e["brightcoveId"]
 				except: newPath = KIJKEMBED_VIDEO_URL+e["id"]
 
@@ -197,6 +203,11 @@ def PopularList(title2=''):
 		return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
 	for e in elements:
+		try: available = e["available"]
+		except: available = False
+		if not available:
+			continue
+
 		try: newPath = BRIGHTCOVE_VIDEO_URL+e["brightcoveId"]
 		except: newPath = KIJKEMBED_VIDEO_URL+e["id"]
 
@@ -260,34 +271,38 @@ def ProgramsList(title2=''):
 		return errorMessage(L("ERROR_PROGRAMS_NO_RESULTS"))
 
 	for e in elements:
-		if e["available"]:
-			try: title = e["title"]
-			except: title = ''
+		try: available = e["available"]
+		except: available = False
+		if not available:
+			continue
 
-			try: summary = e["synopsis"]
-			except: summary = ''
+		try: title = e["title"]
+		except: title = ''
 
-			try: thumbUrl = e["images"]["nonretina_image"]
-			except: thumbUrl = ''
+		try: summary = e["synopsis"]
+		except: summary = ''
 
-			try: artUrl = e["images"]["nonretina_image_pdp_header"]
-			except: artUrl = ''
+		try: thumbUrl = e["images"]["nonretina_image"]
+		except: thumbUrl = ''
 
-			thumb = Resource.ContentsOfURLWithFallback(thumbUrl, R(ICON))
+		try: artUrl = e["images"]["nonretina_image_pdp_header"]
+		except: artUrl = ''
 
-			art = Resource.ContentsOfURLWithFallback(artUrl, R(ART))
+		thumb = Resource.ContentsOfURLWithFallback(thumbUrl, R(ICON))
 
-			try: millis = int(e["duration"].replace(' min.', ''))*60*1000
-			except: millis = 0
+		art = Resource.ContentsOfURLWithFallback(artUrl, R(ART))
 
-			oc.add(DirectoryObject(
-				title = title,
-				thumb = thumb,
-				summary = summary,
-				art = art,
-				duration = millis,
-				key = Callback(EpisodeList, title2=title, path=e["_links"]["self"], art=art)
-			))
+		try: millis = int(e["duration"].replace(' min.', ''))*60*1000
+		except: millis = 0
+
+		oc.add(DirectoryObject(
+			title = title,
+			thumb = thumb,
+			summary = summary,
+			art = art,
+			duration = millis,
+			key = Callback(EpisodeList, title2=title, path=e["_links"]["self"], art=art)
+		))
 
 	oc.objects.sort(key = lambda obj: obj.title.lower())
 	if len(oc) > 0:
@@ -316,6 +331,11 @@ def EpisodeList(title2='', path='', art=R(ART)):
 				return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
 			for e in elements:
+				try: available = e["available"]
+				except: available = False
+				if not available:
+					continue
+					
 				try: newPath = BRIGHTCOVE_VIDEO_URL+e["brightcoveId"]
 				except: newPath = KIJKEMBED_VIDEO_URL+e["id"]
 
