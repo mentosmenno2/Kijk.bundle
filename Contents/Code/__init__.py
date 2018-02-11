@@ -323,8 +323,15 @@ def EpisodeList(title2='', path='', art=R(ART)):
 	except:
 		return errorMessage(L("ERROR_EPISODES_RETREIVING"))
 
+	hasMoreItems = False
 	for s in sections:
-		if s["type"] == "horizontal-single":
+		try: objType = s["type"]
+		except: objType = ''
+
+		if objType == "horizontal-single":
+			try: hasMoreItems = s["hasMoreItems"]
+			except: objType = False
+
 			try:
 				elements = s["items"]
 			except:
@@ -335,7 +342,7 @@ def EpisodeList(title2='', path='', art=R(ART)):
 				except: available = False
 				if not available:
 					continue
-					
+
 				try: newPath = BRIGHTCOVE_VIDEO_URL+e["brightcoveId"]
 				except: newPath = KIJKEMBED_VIDEO_URL+e["id"]
 
@@ -372,6 +379,76 @@ def EpisodeList(title2='', path='', art=R(ART)):
 					duration = millis,
 					url = newPath
 				))
+
+	if hasMoreItems:
+		for s in sections:
+			try: objType = s["type"]
+			except: objType = ''
+
+			if objType == "slider":
+				try:
+					sliderSections = s["sections"]
+				except:
+					continue
+
+				for sliderSection in sliderSections:
+					try:
+						sliderTabSections = sliderSection["sections"]
+					except:
+						continue
+
+				for sliderTabSection in sliderTabSections:
+					try: objType = sliderTabSection["type"]
+					except: objType = ''
+
+					if objType == "vertical":
+						try:
+							elements = sliderTabSection["items"]
+						except:
+							continue
+
+						for e in elements:
+							try: available = e["available"]
+							except: available = False
+							if not available:
+								continue
+
+							try: newPath = BRIGHTCOVE_VIDEO_URL+e["brightcoveId"]
+							except: newPath = KIJKEMBED_VIDEO_URL+e["id"]
+
+							try: seasonLabelShort = e["seasonLabelShort"]
+							except: seasonLabelShort = ''
+
+							try: episode = e["episode"]
+							except: episode = ''
+
+							try: episodeLabel = e["episodeLabel"]
+							except: episodeLabel = ''
+
+							try: summary = e["synopsis"]
+							except: summary = ''
+
+							try: thumbUrl = e["images"]["nonretina_image"]
+							except: thumbUrl = ''
+
+							try: artUrl = e["images"]["nonretina_image_pdp_header"]
+							except: artUrl = ''
+
+							thumb = Resource.ContentsOfURLWithFallback(thumbUrl, R(ICON))
+
+							art = Resource.ContentsOfURLWithFallback(artUrl, R(ART))
+
+							try: millis = e["durationSeconds"]*1000
+							except: millis = 0
+
+							oc.add(VideoClipObject(
+								title = seasonLabelShort+"E"+episode+": "+episodeLabel,
+								thumb = thumb,
+								summary = summary,
+								art = art,
+								duration = millis,
+								url = newPath
+							))
 
 	if len(oc) > 0:
 		return oc
