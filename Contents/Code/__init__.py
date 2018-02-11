@@ -1,6 +1,6 @@
 import string
 import json
-import urllib2
+import urllib
 import datetime
 
 NAME   = 'KIJK'
@@ -65,24 +65,31 @@ def MainMenu():
 	oc = ObjectContainer()
 
 	oc.add(DirectoryObject(
-			title = L("MISSED"),
-			thumb = R(ICON),
-			art = R(ART),
-			key = Callback(MissedDayList, title2=L("MISSED"))
-			#https://api.kijk.nl/v2/templates/page/missed/all/20180208
+		title = L("MISSED"),
+		thumb = R(ICON),
+		art = R(ART),
+		key = Callback(MissedDayList, title2=L("MISSED"))
+		#https://api.kijk.nl/v2/templates/page/missed/all/20180208
 	))
 	oc.add(DirectoryObject(
-			title = L("POPULAR_EPISODES"),
-			thumb = R(ICON),
-			art = R(ART),
-			key = Callback(PopularList, title2=L("POPULAR_EPISODES"))
-			#https://api.kijk.nl/v2/default/sections/popular_PopularVODs
+		title = L("POPULAR_EPISODES"),
+		thumb = R(ICON),
+		art = R(ART),
+		key = Callback(PopularList, title2=L("POPULAR_EPISODES"))
+		#https://api.kijk.nl/v2/default/sections/popular_PopularVODs
 	))
 	oc.add(DirectoryObject(
-			title = L("PROGRAMS_LIST"),
-			thumb = R(ICON),
-			art = R(ART),
-			key = Callback(ProgramsList, title2=L("PROGRAMS_LIST"))
+		title = L("PROGRAMS_LIST"),
+		thumb = R(ICON),
+		art = R(ART),
+		key = Callback(ProgramsList, title2=L("PROGRAMS_LIST"))
+	))
+	oc.add(InputDirectoryObject(
+		title = L("SEARCH"),
+		thumb = R(ICON),
+		art = R(ART),
+		prompt = L("SEARCH_PROMPT"),
+		key = Callback(Search, title2=L("SEARCH"))
 	))
 
 	return oc
@@ -457,11 +464,103 @@ def EpisodeList(title2='', path='', art=R(ART)):
 
 ####################################################################################################
 @indirect
+@route(PREFIX + '/search')
+def Search(title2='', query=''):
+	oc = ObjectContainer(title2=title2, art=R(ART))
+	Log(query)
+	try:
+		encodedQuery = urllib.quote_plus(query)
+		jsonObj = getSearchResult(path='default/searchresultsgrouped?search='+encodedQuery)
+	except:
+		return errorMessage(L("ERROR_SEARCH_RETREIVING"))
+		# return ObjectContainer(header=L("ERROR"), message='/default/searchresultsgrouped?search='+encodedQuery)
+
+	try:
+		elements = jsonObj["results"]
+	except:
+		# return errorMessage(L("ERROR_PROGRAMS_NO_RESULTS"))
+		return ObjectContainer(header=L("ERROR"), message=json.dumps(jsonObj))
+
+	for e in elements:
+		try: objType = e["type"]
+		except: objType = ''
+
+		if objType == "series":
+			try: title = e["title"]+": "+e["subtitle"]
+			except: title = ''
+
+			try: summary = next((item for item in CHANNELS if item['slug'] == e["channel"]), None)["name"]
+			except: summary = ''
+
+			try: thumbUrl = e["images"]["nonretina_image"]
+			except: thumbUrl = ''
+
+			try: artUrl = e["images"]["nonretina_image_pdp_header"]
+			except: artUrl = ''
+
+			thumb = Resource.ContentsOfURLWithFallback(thumbUrl, R(ICON))
+
+			art = Resource.ContentsOfURLWithFallback(artUrl, R(ART))
+
+			oc.add(DirectoryObject(
+				title = title,
+				thumb = thumb,
+				summary = summary,
+				art = art,
+				key = Callback(EpisodeList, title2=title, path='default/pages/series-'+e["_links"]["self"], art=art)
+			))
+
+			try: episodes = e["episodes"]
+			except: episodes = []
+
+			for episode in episodes:
+
+				try: newPath = BRIGHTCOVE_VIDEO_URL+episode["brightcoveId"]
+				except: newPath = KIJKEMBED_VIDEO_URL+episode["id"]
+
+				try: title = episode["title"]+": "+episode["subtitle"]
+				except: title = ''
+
+				try: summary = next((item for item in CHANNELS if item['slug'] == e["channel"]), None)["name"]
+				except: summary = ''
+
+				try: thumbUrl = episode["images"]["nonretina_image"]
+				except: thumbUrl = ''
+
+				try: artUrl = episode["images"]["nonretina_image_pdp_header"]
+				except: artUrl = ''
+
+				thumb = Resource.ContentsOfURLWithFallback(thumbUrl, R(ICON))
+
+				art = Resource.ContentsOfURLWithFallback(artUrl, R(ART))
+
+				oc.add(VideoClipObject(
+					title = title,
+					thumb = thumb,
+					summary = summary,
+					art = art,
+					url = newPath
+				))
+
+	if len(oc) > 0:
+		return oc
+	else:
+		return errorMessage(L("ERROR_SEARCH_NO_RESULTS"))
+
+####################################################################################################
+@indirect
 def getFromAPI(path=''):
 	#receivedJson = urllib.urlopen(API_URL_V1+path).read()
 	#jsonObj = json.loads(receivedJson)
 	#return jsonObj
 	return JSON.ObjectFromURL(API_URL_V1+path)
+
+@indirect
+def getSearchResult(path=''):
+	receivedJson = urllib.urlopen(API_URL_V1+path).read()
+	receivedJson = '{\"results\": '+receivedJson+'}'
+	jsonObj = json.loads(receivedJson)
+	return jsonObj
 
 ####################################################################################################
 @indirect

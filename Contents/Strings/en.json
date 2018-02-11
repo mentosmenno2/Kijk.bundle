@@ -2,7 +2,8 @@
 	"MISSED": "Gemist",
   "POPULAR_EPISODES": "Populaire afleveringen",
   "PROGRAMS_LIST": "Programmalijst",
-	"PROGRAMS_LIST": "Programmalijst",
+	"SEARCH": "Zoeken",
+	"SEARCH_PROMPT": "Vul uw zoekterm in",
 	"TODAY": "Vandaag",
 	"YESTERDAY": "Gisteren",
 	"MONDAY": "Maandag",
@@ -17,4 +18,6 @@
 	"ERROR_EPISODES_NO_RESULTS": "Er zijn geen afleveringen gevonden.",
 	"ERROR_PROGRAMS_RETREIVING": "Er is iets fout gegaan bij het ophalen van de programma's.",
 	"ERROR_PROGRAMS_NO_RESULTS": "Er zijn geen programma's gevonden.",
+	"ERROR_SEARCH_RETREIVING": "Er is iets fout gegaan bij het zoeken.",
+	"ERROR_SEARCH_NO_RESULTS": "Uw zoekopdracht heeft geen resultaten opgeleverd.",
 }
