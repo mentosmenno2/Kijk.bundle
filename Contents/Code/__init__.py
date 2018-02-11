@@ -125,6 +125,9 @@ def MissedEpisodesList(title2='', path=''):
 				return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden")
 
 			for e in elements:
+				try: newPath = e["id"]
+				except: newPath = ''
+
 				try: newPath = e["brightcoveId"]
 				except: continue
 
@@ -143,20 +146,26 @@ def MissedEpisodesList(title2='', path=''):
 				try: summary = e["synopsis"]
 				except: summary = ''
 
-				thumb = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image"], R(ICON))
+				try: thumbUrl = e["images"]["nonretina_image"]
+				except: thumbUrl = ''
 
-				art = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image_pdp_header"], R(ART))
+				try: artUrl = e["images"]["nonretina_image_pdp_header"]
+				except: artUrl = ''
+
+				thumb = Resource.ContentsOfURLWithFallback(thumbUrl, R(ICON))
+
+				art = Resource.ContentsOfURLWithFallback(artUrl, R(ART))
 
 				try: millis = e["durationSeconds"]*1000
 				except: millis = 0
 
-				oc.add(DirectoryObject(
+				oc.add(VideoClipObject(
 					title = title+" - "+seasonLabelShort+"E"+episode+": "+episodeLabel,
 					thumb = thumb,
 					summary = summary,
 					art = art,
 					duration = millis,
-					key = Callback(Episode, title2=episodeLabel, path=newPath) #e["brightcoveId"]
+					url = VIDEO_URL+newPath
 				))
 
 	if len(oc) > 0:
@@ -198,22 +207,25 @@ def PopularList(title2=''):
 		try: summary = e["synopsis"]
 		except: summary = ''
 
-		thumb = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image"], R(ICON))
+		try: thumbUrl = e["images"]["nonretina_image"]
+		except: thumbUrl = ''
 
-		art = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image_pdp_header"], R(ART))
+		try: artUrl = e["images"]["nonretina_image_pdp_header"]
+		except: artUrl = ''
+
+		thumb = Resource.ContentsOfURLWithFallback(thumbUrl, R(ICON))
+
+		art = Resource.ContentsOfURLWithFallback(artUrl, R(ART))
 
 		try: millis = e["durationSeconds"]*1000
 		except: millis = 0
 
-		Log(VIDEO_URL+newPath)
-		# oc.add(DirectoryObject(
 		oc.add(VideoClipObject(
 			title = title+" - "+seasonLabelShort+"E"+episode+": "+episodeLabel,
 			thumb = thumb,
 			summary = summary,
 			art = art,
 			duration = millis,
-			# key = Callback(Episode, title2=episodeLabel, path=newPath)#, rating_key=newPath #e["brightcoveId"]
 			url = VIDEO_URL+newPath
 		))
 
@@ -242,9 +254,15 @@ def ProgramsList(title2=''):
 			try: summary = e["synopsis"]
 			except: summary = ''
 
-			thumb = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image"], R(ICON))
+			try: thumbUrl = e["images"]["nonretina_image"]
+			except: thumbUrl = ''
 
-			art = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image_pdp_header"], R(ART))
+			try: artUrl = e["images"]["nonretina_image_pdp_header"]
+			except: artUrl = ''
+
+			thumb = Resource.ContentsOfURLWithFallback(thumbUrl, R(ICON))
+
+			art = Resource.ContentsOfURLWithFallback(artUrl, R(ART))
 
 			try: millis = int(e["duration"].replace(' min.', ''))*60*1000
 			except: millis = 0
@@ -299,23 +317,28 @@ def EpisodeList(title2='', path='', art=R(ART)):
 				try: summary = e["synopsis"]
 				except: summary = ''
 
-				thumb = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image"], R(ICON))
+				try: thumbUrl = e["images"]["nonretina_image"]
+				except: thumbUrl = ''
 
-				art = Resource.ContentsOfURLWithFallback(e["images"]["nonretina_image_pdp_header"], R(ART))
+				try: artUrl = e["images"]["nonretina_image_pdp_header"]
+				except: artUrl = ''
+
+				thumb = Resource.ContentsOfURLWithFallback(thumbUrl, R(ICON))
+
+				art = Resource.ContentsOfURLWithFallback(artUrl, R(ART))
 
 				try: millis = e["durationSeconds"]*1000
 				except: millis = 0
 
-				oc.add(DirectoryObject(
+				oc.add(VideoClipObject(
 					title = seasonLabelShort+"E"+episode+": "+episodeLabel,
 					thumb = thumb,
 					summary = summary,
 					art = art,
 					duration = millis,
-					key = Callback(Episode, title2=episodeLabel, path=newPath) #e["brightcoveId"]
+					url = VIDEO_URL+newPath
 				))
 
-	oc.objects.sort(key = lambda obj: obj.title.lower())
 	if len(oc) > 0:
 		return oc
 	else:
@@ -323,9 +346,7 @@ def EpisodeList(title2='', path='', art=R(ART)):
 
 ####################################################################################################
 def Episode(title2='', path='', videoUrl='', videoTitle='', videoSummary='', videoThumb='', videoDuration='', includeContainer=False):
-	Log("Episode")
 	if path != '':
-		Log("no path specified")
 		try:
 			jsonObj = getFromBrightcove(path=path) #https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/5574398508001
 			sources = jsonObj["sources"]
@@ -352,7 +373,6 @@ def Episode(title2='', path='', videoUrl='', videoTitle='', videoSummary='', vid
 		except:
 			duration = 0
 
-		# sources.sort(key = lambda obj: obj.avg_bitrate)
 		videofileUrl = ""
 		try:
 			for s in sources:
@@ -364,15 +384,12 @@ def Episode(title2='', path='', videoUrl='', videoTitle='', videoSummary='', vid
 		except:
 			return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van de afleveringskwaliteit aflevering.")
 	else:
-		Log("path specified")
 		title = videoTitle
 		summary = videoSummary
 		thumb = videoThumb
 		duration = videoDuration
 		videofileUrl = videoUrl
 		thumbString = videoThumb
-
-	Log("creating videoclipobject")
 
 	thumb = Resource.ContentsOfURLWithFallback(thumbString, R(ICON))
 	vidObject = EpisodeObject(
@@ -395,10 +412,8 @@ def Episode(title2='', path='', videoUrl='', videoTitle='', videoSummary='', vid
 	)
 
 	if includeContainer:
-		Log("includeContainer true")
 		return ObjectContainer(objects=[vidObject])
 	else:
-		Log("includeContainer false")
 		return vidObject
 
 ####################################################################################################

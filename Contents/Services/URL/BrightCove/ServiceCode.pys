@@ -23,17 +23,32 @@ def MetadataObjectForURL(url):
 	except:
 		summary = ''
 
+	try:
+		seasonEpisodeString = json_obj["custom_fields"]["sbs_episode"]
+		splittedSeasonEpisodeString = seasonEpisodeString.split('S')
+		seasonString = splittedSeasonEpisodeString[0].replace("E", '')
+		episodeString = splittedSeasonEpisodeString[1]
+		season = int(seasonString)
+		episode = int(episodeString)
+	except:
+		seasonEpisodeString = ''
+		season = 1
+		episode = 1
+
 	thumb = Resource.ContentsOfURLWithFallback(json_obj["thumbnail"], '')
+	art = Resource.ContentsOfURLWithFallback(json_obj["poster"], '')
 
 	try:
 		duration = json_obj["duration"]
 	except:
 		duration = ''
 
-	return VideoClipObject(
+	return EpisodeObject(
 		title = title,
 		summary = summary,
 		thumb = thumb,
+		art = art,
+		season = season,
 		duration = duration
 	)
 
@@ -46,7 +61,6 @@ def MediaObjectsForURL(url):
 			],
 			container = Container.MP4,
 			video_codec = VideoCodec.H264,
-			video_resolution = '488',
 			audio_codec = AudioCodec.AAC,
 			audio_channels = 2,
 			optimized_for_streaming = True
@@ -56,14 +70,12 @@ def MediaObjectsForURL(url):
 ####################################################################################################
 @indirect
 def PlayVideo(url, **kwargs):
-	Log("Playvideo")
 	try:
 		json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
 		Log(json_obj)
 		sources = json_obj["sources"]
 	except:
 		raise Ex.MediaNotAvailable
-	Log("Got json")
 	videoUrl = ""
 	try:
 		for s in sources:
