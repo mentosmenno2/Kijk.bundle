@@ -16,8 +16,7 @@
 		<dict>
 			<key>URLPatterns</key>
 			<array>
-				<string>^https:\/\/(www\.)?edge\.api\.brightcove\.com\/playback\/accounts\/videos\/.+</string>
-				<!-- https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/ -->
+				<string>^http(s)?:\/\/(www\.)?edge\.api\.brightcove\.com\/playback\/v1\/accounts\/[0-9]+\/videos\/.+</string>
 			</array>
 		</dict>
 </dict>

@@ -177,7 +177,7 @@ def PopularList(title2=''):
 		return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van de populaire programma's.")
 
 	for e in elements:
-		try: newPath = +e["id"]
+		try: newPath = e["id"]
 		except: newPath = ''
 
 		try: newPath = e["brightcoveId"]
@@ -212,7 +212,7 @@ def PopularList(title2=''):
 			summary = summary,
 			art = art,
 			duration = millis,
-			# key = Callback(Episode, title2=episodeLabel, path=newPath) #e["brightcoveId"]
+			# key = Callback(Episode, title2=episodeLabel, path=newPath)#, rating_key=newPath #e["brightcoveId"]
 			url = VIDEO_URL+newPath
 		))
 
@@ -321,29 +321,84 @@ def EpisodeList(title2='', path='', art=R(ART)):
 		return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden.")
 
 ####################################################################################################
-@route(PREFIX + '/episode')
-def Episode(title2='', path=''):
+def Episode(title2='', path='', videoUrl='', videoTitle='', videoSummary='', videoThumb='', videoDuration='', includeContainer=False):
+	Log("Episode")
+	if path != '':
+		Log("no path specified")
+		try:
+			jsonObj = getFromBrightcove(path=path) #https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/5574398508001
+			sources = jsonObj["sources"]
+		except:
+			return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van deze aflevering.")
 
-	oc = ObjectContainer(title2=title2)
+		try:
+			title = jsonObj["name"]
+		except:
+			title = ''
 
-	try:
-		jsonObj = getFromBrightcove(path=path) #https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/5574398508001
-		sources = jsonObj["sources"]
-	except:
-		return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van deze aflevering.")
+		try:
+			summary = jsonObj["long_description"]
+		except:
+			summary = ''
 
-	# sources.sort(key = lambda obj: obj.avg_bitrate)
-	videoUrl = ""
-	try:
-		for s in sources:
-			if(s["container"] == "MP4"):
-				videoUrl = s["stream_name"].replace("mp4:", '')
-				videoUrlBase = "https://vod-bc-prod-1.sbscdn.nl/"
-				if not videoUrl.startswith(videoUrlBase):
-					videoUrl = videoUrlBase+videoUrl
-	except:
-		ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van de afleveringskwaliteit aflevering.")
-	return ObjectContainer(header="Video URL", message=videoUrl)
+		try:
+			thumbString = jsonObj["thumbnail"]
+		except:
+			thumbString = ''
+
+		try:
+			duration = jsonObj["duration"]
+		except:
+			duration = 0
+
+		# sources.sort(key = lambda obj: obj.avg_bitrate)
+		videofileUrl = ""
+		try:
+			for s in sources:
+				if(s["container"] == "MP4"):
+					videofileUrl = s["stream_name"].replace("mp4:", '')
+					videoUrlBase = "https://vod-bc-prod-1.sbscdn.nl/"
+					if not videofileUrl.startswith(videoUrlBase):
+						videofileUrl = videoUrlBase+videofileUrl
+		except:
+			return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van de afleveringskwaliteit aflevering.")
+	else:
+		Log("path specified")
+		title = videoTitle
+		summary = videoSummary
+		thumb = videoThumb
+		duration = videoDuration
+		videofileUrl = videoUrl
+		thumbString = videoThumb
+
+	Log("creating videoclipobject")
+
+	thumb = Resource.ContentsOfURLWithFallback(thumbString, R(ICON))
+	vidObject = EpisodeObject(
+		key = Callback(Episode, videoUrl=videofileUrl, videoTitle=title, videoSummary=summary, videoThumb=thumbString, videoDuration=duration, includeContainer=True),
+		rating_key = videoUrl,
+		title = title,
+	    summary = summary,
+	    thumb = thumb,
+	    duration = duration,
+		items = [
+			MediaObject(
+				parts = [
+					 PartObject(key=WebVideoURL(videofileUrl))
+				],
+				container = Container.MP4,
+				audio_codec = AudioCodec.AAC,
+				audio_channels = 2
+			)
+		]
+	)
+
+	if includeContainer:
+		Log("includeContainer true")
+		return ObjectContainer(objects=[vidObject])
+	else:
+		Log("includeContainer false")
+		return vidObject
 
 ####################################################################################################
 def getFromAPI(path=''):

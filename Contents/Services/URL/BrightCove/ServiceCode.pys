@@ -14,21 +14,21 @@ def MetadataObjectForURL(url):
     raise Ex.MediaNotAvailable
 
   try:
-		title = json_obj["name"]
-	except:
-		title = ''
+    title = json_obj["name"]
+  except:
+    title = ''
 
   try:
-  		summary = json_obj["long_description"]
-  	except:
-  		summary = ''
+    summary = json_obj["long_description"]
+  except:
+    summary = ''
 
   thumb = Resource.ContentsOfURLWithFallback(json_obj["thumbnail"], '')
 
   try:
-  		duration = json_obj["duration"]
-  	except:
-  		summary = ''
+    duration = json_obj["duration"]
+  except:
+    duration = ''
 
   return VideoClipObject(
     title = title,
@@ -39,7 +39,6 @@ def MetadataObjectForURL(url):
 
   ####################################################################################################
   def MediaObjectsForURL(url):
-
   	return [
   		MediaObject(
   			parts = [
