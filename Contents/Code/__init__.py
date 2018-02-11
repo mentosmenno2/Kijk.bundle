@@ -43,9 +43,18 @@ VIDEO_URL = "https://edge.api.brightcove.com/playback/v1/accounts/585049245001/v
 def Start():
 
 	ObjectContainer.title1 = NAME
+	ObjectContainer.thumb = R(ICON)
 	ObjectContainer.art = R(ART)
+	ObjectContainer.view_group = 'Details'
 
 	DirectoryObject.thumb = R(ICON)
+	DirectoryObject.art = R(ART)
+
+	VideoClipObject.thumb = R(ICON)
+	VideoClipObject.art = R(ART)
+
+	Plugin.AddViewGroup("Details", viewMode="InfoList", mediaType="items")
+	Plugin.AddViewGroup("List", viewMode="List", mediaType="items")
 
 	HTTP.CacheTime = CACHE_1HOUR
 	HTTP.Headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.152 Safari/537.36'
@@ -57,24 +66,24 @@ def MainMenu():
 	oc = ObjectContainer()
 
 	oc.add(DirectoryObject(
-			title = 'Gemist',
+			title = L("MISSED"),
 			thumb = R(ICON),
 			art = R(ART),
-			key = Callback(MissedDayList, title2='Gemist')
+			key = Callback(MissedDayList, title2=L("MISSED"))
 			#https://api.kijk.nl/v2/templates/page/missed/all/20180208
 	))
 	oc.add(DirectoryObject(
-			title = 'Populaire afleveringen',
+			title = L("POPULAR_EPISODES"),
 			thumb = R(ICON),
 			art = R(ART),
-			key = Callback(PopularList, title2='Populaire afleveringen')
+			key = Callback(PopularList, title2=L("POPULAR_EPISODES"))
 			#https://api.kijk.nl/v2/default/sections/popular_PopularVODs
 	))
 	oc.add(DirectoryObject(
-			title = 'Programmalijst',
+			title = L("PROGRAMS_LIST"),
 			thumb = R(ICON),
 			art = R(ART),
-			key = Callback(ProgramsList, title2='Programmalijst')
+			key = Callback(ProgramsList, title2=L("PROGRAMS_LIST"))
 	))
 
 	return oc
@@ -84,7 +93,7 @@ def MainMenu():
 def MissedDayList(title2='', path=''):
 
 	oc = ObjectContainer(title2=title2)
-	dayStrings = ["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag"]
+	dayStrings = [L("MONDAY"), L("TUESDAY"), L("WEDNESDAY"), L("THURSDAY"), L("FRIDAY"), L("SATURDAY"), L("SUNDAY")]
 	now = datetime.datetime.today()
 	for index in range(0, 7):
 		dayDate = now - datetime.timedelta(index)
@@ -92,9 +101,9 @@ def MissedDayList(title2='', path=''):
 		dayPath = "templates/page/missed/all/"+dayDate.strftime("%Y%m%d")
 
 		if(index == 0):
-			dayName = 'Vandaag'
+			dayName = L("TODAY")
 		if(index == 1):
-			dayName = 'Gisteren'
+			dayName = L("YESTERDAY")
 
 		oc.add(DirectoryObject(
 				title = dayName,
@@ -106,6 +115,7 @@ def MissedDayList(title2='', path=''):
 	return oc
 
 ####################################################################################################
+@indirect
 @route(PREFIX + '/missedEpisodesList')
 def MissedEpisodesList(title2='', path=''):
 
@@ -115,14 +125,14 @@ def MissedEpisodesList(title2='', path=''):
 		jsonObj = getFromAPI2(path=path)
 		components = jsonObj["components"]
 	except:
-		return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van de gemiste programma's.")
+		return errorMessage(L("ERROR_EPISODES_RETREIVING"))
 
 	for c in components:
 		if c["type"] == "video_list":
 			try:
 				elements = c["data"]["items"]
 			except:
-				return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden")
+				return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
 			for e in elements:
 				try: newPath = e["id"]
@@ -171,9 +181,10 @@ def MissedEpisodesList(title2='', path=''):
 	if len(oc) > 0:
 		return oc
 	else:
-		return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden.")
+		return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
 ####################################################################################################
+@indirect
 @route(PREFIX + '/popularList')
 def PopularList(title2=''):
 
@@ -181,9 +192,13 @@ def PopularList(title2=''):
 
 	try:
 		jsonObj = getFromAPI2(path='default/sections/popular_PopularVODs?limit=999&offset=0')
+	except:
+		return errorMessage(L("ERROR_EPISODES_RETREIVING"))
+
+	try:
 		elements = jsonObj["items"]
 	except:
-		return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van de populaire programma's.")
+		return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
 	for e in elements:
 		try: newPath = e["id"]
@@ -232,9 +247,10 @@ def PopularList(title2=''):
 	if len(oc) > 0:
 		return oc
 	else:
-		return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden.")
+		return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
 ####################################################################################################
+@indirect
 @route(PREFIX + '/programsList')
 def ProgramsList(title2=''):
 
@@ -242,9 +258,13 @@ def ProgramsList(title2=''):
 
 	try:
 		jsonObj = getFromAPI(path='default/sections/programs-abc-'+DIGS+AZ_LOWER+'?limit=999&offset=0')
+	except:
+		return errorMessage(L("ERROR_PROGRAMS_RETREIVING"))
+
+	try:
 		elements = jsonObj["items"]
 	except:
-		return ObjectContainer(title2=title2, header="Fout", message="Er is iets fout gegaan bij het ophalen van de programmalijst.")
+		return errorMessage(L("ERROR_PROGRAMS_NO_RESULTS"))
 
 	for e in elements:
 		if e["available"]:
@@ -280,9 +300,10 @@ def ProgramsList(title2=''):
 	if len(oc) > 0:
 		return oc
 	else:
-		return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden.")
+		return errorMessage(L("ERROR_PROGRAMS_NO_RESULTS"))
 
 ####################################################################################################
+@indirect
 @route(PREFIX + '/episodeList')
 def EpisodeList(title2='', path='', art=R(ART)):
 
@@ -292,14 +313,14 @@ def EpisodeList(title2='', path='', art=R(ART)):
 		jsonObj = getFromAPI(path=path)
 		sections = jsonObj["sections"]
 	except:
-		return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van dit programma.")
+		return errorMessage(L("ERROR_EPISODES_RETREIVING"))
 
 	for s in sections:
 		if s["type"] == "horizontal-single":
 			try:
 				elements = s["items"]
 			except:
-				return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden.")
+				return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
 			for e in elements:
 				try: newPath = e["brightcoveId"]
@@ -342,81 +363,10 @@ def EpisodeList(title2='', path='', art=R(ART)):
 	if len(oc) > 0:
 		return oc
 	else:
-		return ObjectContainer(header="Geen resultaten", message="Er zijn geen programma's gevonden.")
+		return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
 ####################################################################################################
-def Episode(title2='', path='', videoUrl='', videoTitle='', videoSummary='', videoThumb='', videoDuration='', includeContainer=False):
-	if path != '':
-		try:
-			jsonObj = getFromBrightcove(path=path) #https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/5574398508001
-			sources = jsonObj["sources"]
-		except:
-			return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van deze aflevering.")
-
-		try:
-			title = jsonObj["name"]
-		except:
-			title = ''
-
-		try:
-			summary = jsonObj["long_description"]
-		except:
-			summary = ''
-
-		try:
-			thumbString = jsonObj["thumbnail"]
-		except:
-			thumbString = ''
-
-		try:
-			duration = jsonObj["duration"]
-		except:
-			duration = 0
-
-		videofileUrl = ""
-		try:
-			for s in sources:
-				if(s["container"] == "MP4"):
-					videofileUrl = s["stream_name"].replace("mp4:", '')
-					videoUrlBase = "https://vod-bc-prod-1.sbscdn.nl/"
-					if not videofileUrl.startswith(videoUrlBase):
-						videofileUrl = videoUrlBase+videofileUrl
-		except:
-			return ObjectContainer(header="Fout", message="Er is iets fout gegaan bij het ophalen van de afleveringskwaliteit aflevering.")
-	else:
-		title = videoTitle
-		summary = videoSummary
-		thumb = videoThumb
-		duration = videoDuration
-		videofileUrl = videoUrl
-		thumbString = videoThumb
-
-	thumb = Resource.ContentsOfURLWithFallback(thumbString, R(ICON))
-	vidObject = EpisodeObject(
-		key = Callback(Episode, videoUrl=videofileUrl, videoTitle=title, videoSummary=summary, videoThumb=thumbString, videoDuration=duration, includeContainer=True),
-		rating_key = videoUrl,
-		title = title,
-	    summary = summary,
-	    thumb = thumb,
-	    duration = duration,
-		items = [
-			MediaObject(
-				parts = [
-					 PartObject(key=WebVideoURL(videofileUrl))
-				],
-				container = Container.MP4,
-				audio_codec = AudioCodec.AAC,
-				audio_channels = 2
-			)
-		]
-	)
-
-	if includeContainer:
-		return ObjectContainer(objects=[vidObject])
-	else:
-		return vidObject
-
-####################################################################################################
+@indirect
 def getFromAPI(path=''):
 	#receivedJson = urllib.urlopen(API_URL_V1+path).read()
 	#jsonObj = json.loads(receivedJson)
@@ -424,6 +374,7 @@ def getFromAPI(path=''):
 	return JSON.ObjectFromURL(API_URL_V1+path)
 
 ####################################################################################################
+@indirect
 def getFromAPI2(path=''):
 	#receivedJson = urllib.urlopen(API_URL_V1+path).read()
 	#jsonObj = json.loads(receivedJson)
@@ -431,6 +382,7 @@ def getFromAPI2(path=''):
 	return JSON.ObjectFromURL(API_URL_V2+path)
 
 ####################################################################################################
+@indirect
 def getFromBrightcove(path=''):
 	req = urllib2.Request(VIDEO_URL+path);
 	req.add_header('Accept', "application/json;pk=BCpkADawqM3ve1c3k3HcmzaxBvD8lXCl89K7XEHiKutxZArg2c5RhwJHJANOwPwS_4o7UsC4RhIzXG8Y69mrwKCPlRkIxNgPQVY9qG78SJ1TJop4JoDDcgdsNrg")
@@ -438,3 +390,6 @@ def getFromBrightcove(path=''):
 	jsonObj = json.loads(receivedJson)
 	return jsonObj
 	#return JSON.ObjectFromURL(VIDEO_URL+path)
+
+def errorMessage(message = ''):
+	return ObjectContainer(header=L("ERROR"), message=message)
