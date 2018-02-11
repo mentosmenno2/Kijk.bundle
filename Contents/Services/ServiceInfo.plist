@@ -11,13 +11,13 @@
 				<string>^https:\/\/(www\.)?kijk\.nl\/.*</string>
 			</array>
 		</dict>
-	</dict>
-	<key>BrightCove</key>
+		<key>BrightCove</key>
 		<dict>
 			<key>URLPatterns</key>
 			<array>
 				<string>^http(s)?:\/\/(www\.)?edge\.api\.brightcove\.com\/playback\/v1\/accounts\/[0-9]+\/videos\/.+</string>
 			</array>
 		</dict>
+	</dict>
 </dict>
 </plist>

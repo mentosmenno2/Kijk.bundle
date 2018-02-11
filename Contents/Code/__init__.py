@@ -205,6 +205,7 @@ def PopularList(title2=''):
 		try: millis = e["durationSeconds"]*1000
 		except: millis = 0
 
+		Log(VIDEO_URL+newPath)
 		# oc.add(DirectoryObject(
 		oc.add(VideoClipObject(
 			title = title+" - "+seasonLabelShort+"E"+episode+": "+episodeLabel,

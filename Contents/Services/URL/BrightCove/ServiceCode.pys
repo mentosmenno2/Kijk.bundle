@@ -3,87 +3,87 @@ VIDEOFILE_URL = "https://vod-bc-prod-1.sbscdn.nl/"
 
 HTTP_HEADERS = {
 	'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/602.3.12 (KHTML, like Gecko) Version/10.0.2 Safari/602.3.12',
-	'Accept', 'application/json;pk=BCpkADawqM3ve1c3k3HcmzaxBvD8lXCl89K7XEHiKutxZArg2c5RhwJHJANOwPwS_4o7UsC4RhIzXG8Y69mrwKCPlRkIxNgPQVY9qG78SJ1TJop4JoDDcgdsNrg'
+	'Accept': 'application/json;pk=BCpkADawqM3ve1c3k3HcmzaxBvD8lXCl89K7XEHiKutxZArg2c5RhwJHJANOwPwS_4o7UsC4RhIzXG8Y69mrwKCPlRkIxNgPQVY9qG78SJ1TJop4JoDDcgdsNrg'
 }
 
 ####################################################################################################
 def MetadataObjectForURL(url):
-  try:
+	try:
 		json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
 	except:
-    raise Ex.MediaNotAvailable
+		raise Ex.MediaNotAvailable
 
-  try:
-    title = json_obj["name"]
-  except:
-    title = ''
+	try:
+		title = json_obj["name"]
+	except:
+		title = ''
 
-  try:
-    summary = json_obj["long_description"]
-  except:
-    summary = ''
+	try:
+		summary = json_obj["long_description"]
+	except:
+		summary = ''
 
-  thumb = Resource.ContentsOfURLWithFallback(json_obj["thumbnail"], '')
+	thumb = Resource.ContentsOfURLWithFallback(json_obj["thumbnail"], '')
 
-  try:
-    duration = json_obj["duration"]
-  except:
-    duration = ''
+	try:
+		duration = json_obj["duration"]
+	except:
+		duration = ''
 
-  return VideoClipObject(
-    title = title,
-    summary = summary,
-    thumb = thumb,
-    duration = duration
-  )
+	return VideoClipObject(
+		title = title,
+		summary = summary,
+		thumb = thumb,
+		duration = duration
+	)
 
-  ####################################################################################################
-  def MediaObjectsForURL(url):
-  	return [
-  		MediaObject(
-  			parts = [
-  				PartObject(key=Callback(PlayVideo, url=url, url=url))
-  			],
-  			container = Container.MP4,
-  			video_codec = VideoCodec.H264,
-  			video_resolution = '488',
-  			audio_codec = AudioCodec.AAC,
-  			audio_channels = 2,
-  			optimized_for_streaming = True
-  		)
-  	]
+	####################################################################################################
+def MediaObjectsForURL(url):
+	return [
+		MediaObject(
+			parts = [
+				PartObject(key=Callback(PlayVideo, url=url, url=url))
+			],
+			container = Container.MP4,
+			video_codec = VideoCodec.H264,
+			video_resolution = '488',
+			audio_codec = AudioCodec.AAC,
+			audio_channels = 2,
+			optimized_for_streaming = True
+		)
+	]
 
 ####################################################################################################
 @indirect
 def PlayVideo(url, **kwargs):
-
-  try:
-    json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
-    sources = jsonObj["sources"]
-  except:
-    raise Ex.MediaNotAvailable
-
-  videoUrl = ""
+	Log("Playvideo")
+	try:
+		json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
+		Log(json_obj)
+		sources = json_obj["sources"]
+	except:
+		raise Ex.MediaNotAvailable
+	Log("Got json")
+	videoUrl = ""
 	try:
 		for s in sources:
 			if(s["container"] == "MP4"):
 				videoUrl = s["stream_name"].replace("mp4:", '')
-        VIDEOFILE_URL
 				if not videoUrl.startswith(VIDEOFILE_URL):
 					videoUrl = VIDEOFILE_URL+videoUrl
 	except:
 		raise Ex.MediaNotAvailable
-
-  if videoUrl != "":
-    return IndirectResponse(VideoClipObject, key=videoUrl)
-
-  raise Ex.MediaNotAvailable
+	Log(videoUrl)
+	if videoUrl != "":
+		return IndirectResponse(VideoClipObject, key=videoUrl)
+	else:
+		raise Ex.MediaNotAvailable
 
 ####################################################################################################
 def getUrl(url):
-  newUrl = url
-  if VIDEO_URL not in url:
-    newUrl = VIDEO_URL+url
-  return newUrl
+	newUrl = url
+	if VIDEO_URL not in url:
+		newUrl = VIDEO_URL+url
+	return newUrl
 
 ####################################################################################################
