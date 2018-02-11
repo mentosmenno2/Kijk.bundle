@@ -35,15 +35,14 @@ API_URL_V1 = 'https://api.kijk.nl/v1/'
 API_URL_V2 = 'https://api.kijk.nl/v2/'
 
 RE_SERIES = 'http://kijk.nl/(.*?)/(.*?)'
-KIJK_VIDEO_URL = "https://www.kijk.nl/video/"
-VIDEO_URL = "https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/"
+KIJKEMBED_VIDEO_URL = "http://embed.kijk.nl/api/video/"
+BRIGHTCOVE_VIDEO_URL = "https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/"
 
 
 ####################################################################################################
 def Start():
 
 	ObjectContainer.title1 = NAME
-	ObjectContainer.thumb = R(ICON)
 	ObjectContainer.art = R(ART)
 	ObjectContainer.view_group = 'Details'
 
@@ -135,11 +134,8 @@ def MissedEpisodesList(title2='', path=''):
 				return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
 			for e in elements:
-				try: newPath = e["id"]
-				except: newPath = ''
-
-				try: newPath = e["brightcoveId"]
-				except: continue
+				try: newPath = BRIGHTCOVE_VIDEO_URL+e["brightcoveId"]
+				except: newPath = KIJKEMBED_VIDEO_URL+e["id"]
 
 				try: title = e["title"]
 				except: title = ''
@@ -175,7 +171,7 @@ def MissedEpisodesList(title2='', path=''):
 					summary = summary,
 					art = art,
 					duration = millis,
-					url = VIDEO_URL+newPath
+					url = newPath
 				))
 
 	if len(oc) > 0:
@@ -201,11 +197,8 @@ def PopularList(title2=''):
 		return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
 	for e in elements:
-		try: newPath = e["id"]
-		except: newPath = ''
-
-		try: newPath = e["brightcoveId"]
-		except: continue
+		try: newPath = BRIGHTCOVE_VIDEO_URL+e["brightcoveId"]
+		except: newPath = KIJKEMBED_VIDEO_URL+e["id"]
 
 		try: title = e["title"]
 		except: title = ''
@@ -241,7 +234,7 @@ def PopularList(title2=''):
 			summary = summary,
 			art = art,
 			duration = millis,
-			url = VIDEO_URL+newPath
+			url = newPath
 		))
 
 	if len(oc) > 0:
@@ -323,8 +316,8 @@ def EpisodeList(title2='', path='', art=R(ART)):
 				return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
 			for e in elements:
-				try: newPath = e["brightcoveId"]
-				except: continue
+				try: newPath = BRIGHTCOVE_VIDEO_URL+e["brightcoveId"]
+				except: newPath = KIJKEMBED_VIDEO_URL+e["id"]
 
 				try: seasonLabelShort = e["seasonLabelShort"]
 				except: seasonLabelShort = ''
@@ -357,7 +350,7 @@ def EpisodeList(title2='', path='', art=R(ART)):
 					summary = summary,
 					art = art,
 					duration = millis,
-					url = VIDEO_URL+newPath
+					url = newPath
 				))
 
 	if len(oc) > 0:
@@ -382,14 +375,5 @@ def getFromAPI2(path=''):
 	return JSON.ObjectFromURL(API_URL_V2+path)
 
 ####################################################################################################
-@indirect
-def getFromBrightcove(path=''):
-	req = urllib2.Request(VIDEO_URL+path);
-	req.add_header('Accept', "application/json;pk=BCpkADawqM3ve1c3k3HcmzaxBvD8lXCl89K7XEHiKutxZArg2c5RhwJHJANOwPwS_4o7UsC4RhIzXG8Y69mrwKCPlRkIxNgPQVY9qG78SJ1TJop4JoDDcgdsNrg")
-	receivedJson = urllib2.urlopen(req).read()
-	jsonObj = json.loads(receivedJson)
-	return jsonObj
-	#return JSON.ObjectFromURL(VIDEO_URL+path)
-
 def errorMessage(message = ''):
 	return ObjectContainer(header=L("ERROR"), message=message)

@@ -4,11 +4,11 @@
 <dict>
 	<key>URL</key>
 	<dict>
-		<key>KijkGemist</key>
+		<key>KijkEmbed</key>
 		<dict>
 			<key>URLPatterns</key>
 			<array>
-				<string>^https:\/\/(www\.)?kijk\.nl\/.*</string>
+				<string>^http(s)?:\/\/(www\.)?(embed\.)?kijk\.nl\/api\/video\/.*</string>
 			</array>
 		</dict>
 		<key>BrightCove</key>
