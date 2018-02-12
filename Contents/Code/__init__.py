@@ -1,6 +1,7 @@
 import string
 import json
 import urllib
+import urllib2
 import datetime
 
 NAME   = 'KIJK 2.0'
@@ -557,7 +558,8 @@ def getFromAPI(path=''):
 
 @indirect
 def getSearchResult(path=''):
-	receivedJson = urllib.urlopen(API_URL_V1+path).read()
+	receivedJson = urllib2.urlopen(API_URL_V1+path).read()
+	Log(receivedJson)
 	receivedJson = '{\"results\": '+receivedJson+'}'
 	jsonObj = json.loads(receivedJson)
 	return jsonObj
