@@ -468,20 +468,16 @@ def EpisodeList(title2='', path='', art=R(ART)):
 @route(PREFIX + '/search')
 def Search(title2='', query=''):
 	oc = ObjectContainer(title2=title2, art=R(ART))
-	Log(query)
 	try:
 		encodedQuery = urllib.quote_plus(query)
-		Log("encoded"+encodedQuery)
 		jsonObj = getSearchResult(path='default/searchresultsgrouped?search='+encodedQuery)
 	except:
-		# return errorMessage(L("ERROR_SEARCH_RETREIVING"))
-		return ObjectContainer(header=L("ERROR"), message='/default/searchresultsgrouped?search='+encodedQuery)
+		return errorMessage(L("ERROR_SEARCH_RETREIVING"))
 
 	try:
 		elements = jsonObj["results"]
 	except:
-		# return errorMessage(L("ERROR_PROGRAMS_NO_RESULTS"))
-		return ObjectContainer(header=L("ERROR"), message=json.dumps(jsonObj))
+		return errorMessage(L("ERROR_PROGRAMS_NO_RESULTS"))
 
 	for e in elements:
 		try: objType = e["type"]
@@ -559,9 +555,11 @@ def getFromAPI(path=''):
 
 @indirect
 def getSearchResult(path=''):
+	Log("GetSearchResult")
+	Log(API_URL_V1+path)
 	receivedJson = urllib2.urlopen(API_URL_V1+path).read()
 	Log(receivedJson)
-	receivedJson = '{\"results\": '+receivedJson+'}'
+	receivedJson = "{\"results\": "+receivedJson+"}"
 	jsonObj = json.loads(receivedJson)
 	return jsonObj
 
