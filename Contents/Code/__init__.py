@@ -3,7 +3,7 @@ import json
 import urllib
 import datetime
 
-NAME   = 'KIJK'
+NAME   = 'KIJK 2.0'
 ICON   = 'icon-default.png'
 ART    = 'art-default.jpg'
 PREFIX = '/video/kijk'

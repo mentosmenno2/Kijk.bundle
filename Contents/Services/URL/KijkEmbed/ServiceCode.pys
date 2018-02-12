@@ -9,9 +9,22 @@ HTTP_HEADERS = {
 ####################################################################################################
 def MetadataObjectForURL(url):
 	try:
-		json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)["metadata"]
+		jsonObj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
 	except:
 		raise Ex.MediaNotAvailable
+
+	try:
+		json_obj = jsonObj["metadata"]
+	except:
+		Log(jsonObj)
+		if "error" in jsonObj:
+			error = jsonObj["error"]
+			if error["code"] == 403 and "GEO_BLOCKED" in error["message"]:
+				raise Ex.MediaGeoblocked
+			else:
+				raise Ex.MediaNotAvailable
+		else:
+			raise Ex.MediaNotAvailable
 
 	try:
 		title = json_obj["title"]
