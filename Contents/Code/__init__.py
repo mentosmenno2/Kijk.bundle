@@ -471,6 +471,7 @@ def Search(title2='', query=''):
 	Log(query)
 	try:
 		encodedQuery = urllib.quote_plus(query)
+		Log("encoded"+encodedQuery)
 		jsonObj = getSearchResult(path='default/searchresultsgrouped?search='+encodedQuery)
 	except:
 		# return errorMessage(L("ERROR_SEARCH_RETREIVING"))
