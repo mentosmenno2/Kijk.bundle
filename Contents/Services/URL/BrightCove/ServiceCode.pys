@@ -1,5 +1,4 @@
 VIDEO_URL = "https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/"
-VIDEOFILE_URL = "https://vod-bc-prod-1.sbscdn.nl/"
 
 HTTP_HEADERS = {
 	'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/602.3.12 (KHTML, like Gecko) Version/10.0.2 Safari/602.3.12',

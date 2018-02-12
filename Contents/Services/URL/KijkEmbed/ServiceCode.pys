@@ -1,6 +1,5 @@
-VIDEO_URL = "http://embed.kijk.nl/api/video/"
+VIDEO_URL = "https://embed.kijk.nl/api/video/"
 VIDEO_URL_AFTER = "?id=kijkapp"
-VIDEOFILE_URL = "https://vod-bc-prod-1.sbscdn.nl/"
 
 HTTP_HEADERS = {
 	'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/602.3.12 (KHTML, like Gecko) Version/10.0.2 Safari/602.3.12'
@@ -9,6 +8,7 @@ HTTP_HEADERS = {
 ####################################################################################################
 def MetadataObjectForURL(url):
 	try:
+		Log(getUrl(url))
 		jsonObj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
 	except:
 		raise Ex.MediaNotAvailable
