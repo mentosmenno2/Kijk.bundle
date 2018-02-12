@@ -35,7 +35,7 @@ API_URL_V1 = 'https://api.kijk.nl/v1/'
 API_URL_V2 = 'https://api.kijk.nl/v2/'
 
 RE_SERIES = 'http://kijk.nl/(.*?)/(.*?)'
-KIJKEMBED_VIDEO_URL = "http://embed.kijk.nl/api/video/"
+KIJKEMBED_VIDEO_URL = "https://embed.kijk.nl/api/video/"
 BRIGHTCOVE_VIDEO_URL = "https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/"
 
 
