@@ -106,7 +106,7 @@ def MissedDayList(title2='', path=''):
 		dayDate = now - datetime.timedelta(index)
 		dayName = dayStrings[dayDate.weekday()]
 		dayDateString = dayDate.strftime("%d-%m-%Y")
-		dayPath = "default/sections/missed-all-"+dayDate.strftime("%Y%m%d")+"?limit=350&offset=0\"
+		dayPath = "default/sections/missed-all-"+dayDate.strftime("%Y%m%d")+"?limit=350&offset=0"
 
 		if(index == 0):
 			dayName = L("TODAY")
