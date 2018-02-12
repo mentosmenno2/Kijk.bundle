@@ -472,8 +472,8 @@ def Search(title2='', query=''):
 		encodedQuery = urllib.quote_plus(query)
 		jsonObj = getSearchResult(path='default/searchresultsgrouped?search='+encodedQuery)
 	except:
-		return errorMessage(L("ERROR_SEARCH_RETREIVING"))
-		# return ObjectContainer(header=L("ERROR"), message='/default/searchresultsgrouped?search='+encodedQuery)
+		# return errorMessage(L("ERROR_SEARCH_RETREIVING"))
+		return ObjectContainer(header=L("ERROR"), message='/default/searchresultsgrouped?search='+encodedQuery)
 
 	try:
 		elements = jsonObj["results"]
