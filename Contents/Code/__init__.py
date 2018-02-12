@@ -106,7 +106,7 @@ def MissedDayList(title2='', path=''):
 		dayDate = now - datetime.timedelta(index)
 		dayName = dayStrings[dayDate.weekday()]
 		dayDateString = dayDate.strftime("%d-%m-%Y")
-		dayPath = "templates/page/missed/all/"+dayDate.strftime("%Y%m%d")
+		dayPath = "default/sections/missed-all-"+dayDate.strftime("%Y%m%d")+"?limit=350&offset=0\"
 
 		if(index == 0):
 			dayName = L("TODAY")
@@ -130,63 +130,60 @@ def MissedEpisodesList(title2='', path=''):
 	oc = ObjectContainer(title2=title2, art=R(ART))
 
 	try:
-		jsonObj = getFromAPI2(path=path)
-		components = jsonObj["components"]
+		jsonObj = getFromAPI(path=path)
 	except:
 		return errorMessage(L("ERROR_EPISODES_RETREIVING"))
 
-	for c in components:
-		if c["type"] == "video_list":
-			try:
-				elements = c["data"]["items"]
-			except:
-				return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
+	try:
+		elements = jsonObj["items"]
+	except:
+		return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
-			for e in elements:
-				try: available = e["available"]
-				except: available = False
-				if not available:
-					continue
+	for e in elements:
+		try: available = e["available"]
+		except: available = False
+		if not available:
+			continue
 
-				try: newPath = BRIGHTCOVE_VIDEO_URL+e["brightcoveId"]
-				except: newPath = KIJKEMBED_VIDEO_URL+e["id"]
+		try: newPath = BRIGHTCOVE_VIDEO_URL+e["brightcoveId"]
+		except: newPath = KIJKEMBED_VIDEO_URL+e["id"]
 
-				try: title = e["title"]
-				except: title = ''
+		try: title = e["title"]
+		except: title = ''
 
-				try: seasonLabelShort = e["seasonLabelShort"]
-				except: seasonLabelShort = ''
+		try: seasonLabelShort = e["seasonLabelShort"]
+		except: seasonLabelShort = ''
 
-				try: episode = e["episode"]
-				except: episode = ''
+		try: episode = e["episode"]
+		except: episode = ''
 
-				try: episodeLabel = e["episodeLabel"]
-				except: episodeLabel = ''
+		try: episodeLabel = e["episodeLabel"]
+		except: episodeLabel = ''
 
-				try: summary = e["synopsis"]
-				except: summary = ''
+		try: summary = e["synopsis"]
+		except: summary = ''
 
-				try: thumbUrl = e["images"]["nonretina_image"]
-				except: thumbUrl = ''
+		try: thumbUrl = e["images"]["nonretina_image"]
+		except: thumbUrl = ''
 
-				try: artUrl = e["images"]["nonretina_image_pdp_header"]
-				except: artUrl = ''
+		try: artUrl = e["images"]["nonretina_image_pdp_header"]
+		except: artUrl = ''
 
-				thumb = Resource.ContentsOfURLWithFallback(thumbUrl, R(ICON))
+		thumb = Resource.ContentsOfURLWithFallback(thumbUrl, R(ICON))
 
-				art = Resource.ContentsOfURLWithFallback(artUrl, R(ART))
+		art = Resource.ContentsOfURLWithFallback(artUrl, R(ART))
 
-				try: millis = e["durationSeconds"]*1000
-				except: millis = 0
+		try: millis = e["durationSeconds"]*1000
+		except: millis = 0
 
-				oc.add(VideoClipObject(
-					title = title+" - "+seasonLabelShort+"E"+episode+": "+episodeLabel,
-					thumb = thumb,
-					summary = summary,
-					art = art,
-					duration = millis,
-					url = newPath
-				))
+		oc.add(VideoClipObject(
+			title = title+" - "+seasonLabelShort+"E"+episode+": "+episodeLabel,
+			thumb = thumb,
+			summary = summary,
+			art = art,
+			duration = millis,
+			url = newPath
+		))
 
 	if len(oc) > 0:
 		return oc
