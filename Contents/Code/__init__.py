@@ -28,6 +28,11 @@ CHANNELS = [
 	}
 ]
 
+ICON_MISSED = 'missed.png'
+ICON_POPULAR = 'popular.png'
+ICON_PROGRAMS = 'programs.png'
+ICON_SEARCH = 'search.png'
+
 AZ_UPPER = string.ascii_uppercase
 AZ_LOWER = string.ascii_lowercase
 DIGS = string.digits
@@ -67,27 +72,27 @@ def MainMenu():
 
 	oc.add(DirectoryObject(
 		title = L("MISSED"),
-		thumb = R(ICON),
+		thumb = R(ICON_MISSED),
 		art = R(ART),
 		key = Callback(MissedDayList, title2=L("MISSED"))
 		#https://api.kijk.nl/v2/templates/page/missed/all/20180208
 	))
 	oc.add(DirectoryObject(
 		title = L("POPULAR_EPISODES"),
-		thumb = R(ICON),
+		thumb = R(ICON_POPULAR),
 		art = R(ART),
 		key = Callback(PopularList, title2=L("POPULAR_EPISODES"))
 		#https://api.kijk.nl/v2/default/sections/popular_PopularVODs
 	))
 	oc.add(DirectoryObject(
 		title = L("PROGRAMS_LIST"),
-		thumb = R(ICON),
+		thumb = R(ICON_PROGRAMS),
 		art = R(ART),
 		key = Callback(ProgramsList, title2=L("PROGRAMS_LIST"))
 	))
 	oc.add(InputDirectoryObject(
 		title = L("SEARCH"),
-		thumb = R(ICON),
+		thumb = R(ICON_SEARCH),
 		art = R(ART),
 		prompt = L("SEARCH_PROMPT"),
 		key = Callback(Search, title2=L("SEARCH"))
