@@ -9,17 +9,18 @@ There are multiple ways to insrall.
 Method 1: Unofficial App Store
 1: Make sure you have the Unofficial App Store installed.
 2: In the "Plug-In fron url field, enter this repo url.
+3: Press the button next to it, and let the magic happen.
 
 Method 2: Git clone
 1. Navigate to your Plug-ins directory. 
 2. Run sudo git clone THIS_REPO_URL.
-3. Restart your plex Plex Media Server
+3. Restart your plex Plex Media Server.
 
 Method 3: Zip file
 1. Download this repo as zip.
 2. Extract the zip file in your Plug-Ins directory.
 3. Rename the extracted folder to Kijk.bundle
-4. Restart Plex Media Server
+4. Restart Plex Media Server.
 
 ## Old plugins
 
