@@ -2,6 +2,25 @@
 
 Welcome! This plugin is a tool to watch missed episodes from the Dutch TV channels owned by the SBS Broadcasting company. These channels are SBS6, Veronica, NET5 and SBS9.
 
+## Installation
+
+There are multiple ways to insrall. 
+
+Method 1: Unofficial App Store
+1: Make sure you have the Unofficial App Store installed.
+2: In the "Plug-In fron url field, enter this repo url.
+
+Method 2: Git clone
+1. Navigate to your Plug-ins directory. 
+2. Run sudo git clone THIS_REPO_URL.
+3. Restart your plex Plex Media Server
+
+Method 3: Zip file
+1. Download this repo as zip.
+2. Extract the zip file in your Plug-Ins directory.
+3. Rename the extracted folder to Kijk.bundle
+4. Restart Plex Media Server
+
 ## Old plugins
 
 This plug-in is an edited copy of the unofficial KIJK plug-in found [here](https://github.com/yutzhead/Kijk.bundle).
