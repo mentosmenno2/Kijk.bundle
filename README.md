@@ -4,23 +4,24 @@ Welcome! This plugin is a tool to watch missed episodes from the Dutch TV channe
 
 ## Installation
 
-There are multiple ways to insrall. 
+There are multiple ways to insrall.
 
 Method 1: Unofficial App Store
-1: Make sure you have the Unofficial App Store installed.
+1: Make sure you have the [Unofficial App Store](https://github.com/ukdtom/WebTools.bundle) installed.
 2: In the "Plug-In fron url field, enter this repo url.
-3: Press the button next to it, and let the magic happen.
+3: Press the 'Manual Installation' button next to the input field, and let the magic happen.
 
 Method 2: Git clone
-1. Navigate to your Plug-ins directory. 
-2. Run sudo git clone THIS_REPO_URL.
+1. Navigate to your [Plug-ins directory](https://support.plex.tv/articles/201106098-how-do-i-find-the-plug-ins-folder/).
+2. Run `git clone THIS_REPO_URL`. Make sure to replace THIS_REPO_URL with the url of this repo. If you don't have the right permissions, try putting sudo in front of it.
 3. Restart your plex Plex Media Server.
 
 Method 3: Zip file
 1. Download this repo as zip.
-2. Extract the zip file in your Plug-Ins directory.
+2. Extract the zip file in your [Plug-ins directory](https://support.plex.tv/articles/201106098-how-do-i-find-the-plug-ins-folder/).
 3. Rename the extracted folder to Kijk.bundle
-4. Restart Plex Media Server.
+4. Make sure your folder structure now looks like this: Plug-Ins/Kijk.bundle/Contents.
+5. Restart Plex Media Server.
 
 ## Old plugins
 
