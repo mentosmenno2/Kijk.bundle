@@ -78,12 +78,14 @@ def PlayVideo(url, **kwargs):
 	videoUrl = ""
 	if onlyMP4():
 		Log("This video will be played as MP4")
+		previousBitrate = 0
 		try:
 			for s in sources:
-				if(s["container"] == "MP4"):
+				if(s["container"] == "MP4" and s["avg_bitrate"] > previousBitrate):
 					videoUrl = s["stream_name"].replace("mp4:", '')
 					if not videoUrl.startswith(VIDEOFILE_URL):
 						videoUrl = VIDEOFILE_URL+videoUrl
+					previousBitrate = s["avg_bitrate"]
 		except:
 			raise Ex.MediaNotAvailable
 	else:
