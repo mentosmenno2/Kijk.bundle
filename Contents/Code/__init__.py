@@ -490,11 +490,14 @@ def EpisodeList(title2='', path='', art=R(ART)):
 @route(PREFIX + '/search')
 def Search(title2='', query=''):
 	oc = ObjectContainer(title2=title2, art=R(ART))
-	try:
-		encodedQuery = urllib.quote_plus(query)
-		jsonObj = getSearchResult(path='default/searchresultsgrouped?search='+encodedQuery)
-	except:
-		return errorMessage(L("ERROR_SEARCH_RETREIVING"))
+	encodedQuery = urllib.quote_plus(query)
+	jsonObj = getSearchResult(path='default/searchresultsgrouped?search='+encodedQuery)
+	Log(jsonObj)
+	# try:
+	# 	encodedQuery = urllib.quote_plus(query)
+	# 	jsonObj = getSearchResult(path='default/searchresultsgrouped?search='+encodedQuery)
+	# except:
+	# 	return errorMessage(L("ERROR_SEARCH_RETREIVING"))
 
 	try:
 		elements = jsonObj["results"]
