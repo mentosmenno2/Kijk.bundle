@@ -1,3 +1,5 @@
+import urllib
+
 VIDEO_URL = "https://embed.kijk.nl/api/video/"
 VIDEO_URL_AFTER = "?id=kijkapp"
 
@@ -7,7 +9,7 @@ HTTP_HEADERS = {
 
 ####################################################################################################
 def MetadataObjectForURL(url):
-	test = HTTP.Request(getUrl(url), CACHE_1MONTH).content,
+	test = urllib.urlopen(getUrl(url)).read()
 	Log(test)
 
 	try:
