@@ -1,4 +1,5 @@
 VIDEO_URL = "https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/"
+VIDEOFILE_URL = "https://vod-bc-prod-1.sbscdn.nl/"
 
 HTTP_HEADERS = {
 	'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/602.3.12 (KHTML, like Gecko) Version/10.0.2 Safari/602.3.12',
@@ -75,18 +76,24 @@ def PlayVideo(url, **kwargs):
 	except:
 		raise Ex.MediaNotAvailable
 	videoUrl = ""
-	# try:
-	# 	for s in sources:
-	# 		if(s["container"] == "MP4"):
-	# 			videoUrl = s["stream_name"].replace("mp4:", '')
-	# 			if not videoUrl.startswith(VIDEOFILE_URL):
-	# 				videoUrl = VIDEOFILE_URL+videoUrl
-	try:
-		for s in sources:
-			if(s["container"] == "M2TS"):
-				videoUrl = s["src"]
-	except:
-		raise Ex.MediaNotAvailable
+	if onlyMP4():
+		Log("This video will be played as MP4")
+		try:
+			for s in sources:
+				if(s["container"] == "MP4"):
+					videoUrl = s["stream_name"].replace("mp4:", '')
+					if not videoUrl.startswith(VIDEOFILE_URL):
+						videoUrl = VIDEOFILE_URL+videoUrl
+		except:
+			raise Ex.MediaNotAvailable
+	else:
+		Log("This video will be played as Stream")
+		try:
+			for s in sources:
+				if(s["container"] == "M2TS"):
+					videoUrl = s["src"]
+		except:
+			raise Ex.MediaNotAvailable
 	if videoUrl != "":
 		return IndirectResponse(VideoClipObject, key=videoUrl)
 	else:
@@ -100,3 +107,8 @@ def getUrl(url):
 	return newUrl
 
 ####################################################################################################
+def onlyMP4():
+	onlymp4 = False
+	if Client.Platform == 'Samsung': #Samsung smart tv
+		onlymp4 = True
+	return onlymp4

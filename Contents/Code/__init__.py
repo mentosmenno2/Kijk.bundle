@@ -98,10 +98,6 @@ def MainMenu():
 		key = Callback(Search, title2=L("SEARCH"))
 	))
 
-	Log("Client:")
-	Log(Client.Platform)
-	Log("Protocols:")
-	Log(Client.Protocols)
 	return oc
 
 ####################################################################################################
@@ -151,6 +147,10 @@ def MissedEpisodesList(title2='', path=''):
 	for e in elements:
 		try: available = e["available"]
 		except: available = False
+
+		if onlyMP4() and "brightcoveId" not in e:
+			available = False
+
 		if not available:
 			continue
 
@@ -219,6 +219,10 @@ def PopularList(title2=''):
 	for e in elements:
 		try: available = e["available"]
 		except: available = False
+
+		if onlyMP4() and "brightcoveId" not in e:
+			available = False
+
 		if not available:
 			continue
 
@@ -287,6 +291,10 @@ def ProgramsList(title2=''):
 	for e in elements:
 		try: available = e["available"]
 		except: available = False
+
+		if onlyMP4() and "brightcoveId" not in e:
+			available = False
+
 		if not available:
 			continue
 
@@ -354,6 +362,10 @@ def EpisodeList(title2='', path='', art=R(ART)):
 			for e in elements:
 				try: available = e["available"]
 				except: available = False
+
+				if onlyMP4() and "brightcoveId" not in e:
+					available = False
+
 				if not available:
 					continue
 
@@ -424,6 +436,10 @@ def EpisodeList(title2='', path='', art=R(ART)):
 						for e in elements:
 							try: available = e["available"]
 							except: available = False
+
+							if onlyMP4() and "brightcoveId" not in e:
+								available = False
+
 							if not available:
 								continue
 
@@ -576,6 +592,13 @@ def getFromAPI2(path=''):
 	#jsonObj = json.loads(receivedJson)
 	#return jsonObj
 	return JSON.ObjectFromURL(API_URL_V2+path)
+
+####################################################################################################
+def onlyMP4():
+	onlymp4 = False
+	if Client.Platform == 'Samsung': #Samsung smart tv
+		onlymp4 = True
+	return onlymp4
 
 ####################################################################################################
 def errorMessage(message = ''):
