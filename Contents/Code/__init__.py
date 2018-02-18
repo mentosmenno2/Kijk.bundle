@@ -98,6 +98,10 @@ def MainMenu():
 		key = Callback(Search, title2=L("SEARCH"))
 	))
 
+	Log("Client:")
+	Log(Client.Platform)
+	Log("Protocols:")
+	Log(Client.Protocols)
 	return oc
 
 ####################################################################################################
