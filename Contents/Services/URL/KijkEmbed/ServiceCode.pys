@@ -10,7 +10,7 @@ def MetadataObjectForURL(url):
 	try:
 		json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)["metadata"]
 	except:
-		raise Ex.MediaGeoblocked
+		raise Ex.MediaNotAvailable
 
 	try:
 		title = json_obj["title"]
