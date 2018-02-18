@@ -7,9 +7,9 @@ HTTP_HEADERS = {
 
 ####################################################################################################
 def MetadataObjectForURL(url):
-	try:
-		test = urllib.urlopen(getUrl(url)).read()
-		Log(test)
+	test = HTTP.Request(getUrl(url), CACHE_1MONTH).content,
+	Log(test)
+
 	try:
 		json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)["metadata"]
 	except:
