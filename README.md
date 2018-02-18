@@ -7,9 +7,9 @@ Welcome! This plugin is a tool to watch missed episodes from the Dutch TV channe
 There are multiple ways to insrall.
 
 Method 1: Unofficial App Store
-1: Make sure you have the [Unofficial App Store](https://github.com/ukdtom/WebTools.bundle) installed.
-2: In the "Plug-In fron url field, enter this repo url.
-3: Press the 'Manual Installation' button next to the input field, and let the magic happen.
+1. Make sure you have the [Unofficial App Store](https://github.com/ukdtom/WebTools.bundle) installed.
+2. In the "Plug-In fron url field, enter this repo url.
+3. Press the 'Manual Installation' button next to the input field, and let the magic happen.
 
 Method 2: Git clone
 1. Navigate to your [Plug-ins directory](https://support.plex.tv/articles/201106098-how-do-i-find-the-plug-ins-folder/).
