@@ -1,4 +1,5 @@
 import urllib
+import ssl
 
 VIDEO_URL = "https://embed.kijk.nl/api/video/"
 VIDEO_URL_AFTER = "?id=kijkapp"
@@ -9,7 +10,9 @@ HTTP_HEADERS = {
 
 ####################################################################################################
 def MetadataObjectForURL(url):
-	test = urllib.urlopen(getUrl(url)).read()
+	context = ssl._create_unverified_context()
+	test = urllib.urlopen(getUrl(url), context=context).read()
+	Log(getUrl(url))
 	Log(test)
 
 	try:
