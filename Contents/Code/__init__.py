@@ -582,7 +582,8 @@ def getFromAPI(path=''):
 def getSearchResult(path=''):
 	Log("GetSearchResult")
 	Log(API_URL_V1+path)
-	receivedJson = urllib2.urlopen(API_URL_V1+path).read()
+	gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+	receivedJson = urllib2.urlopen(API_URL_V1+path, context=gcontext).read()
 	Log(receivedJson)
 	receivedJson = "{\"results\": "+receivedJson+"}"
 	jsonObj = json.loads(receivedJson)
