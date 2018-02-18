@@ -2,6 +2,7 @@ import string
 import json
 import urllib
 import urllib2
+import ssl
 import datetime
 
 NAME   = 'KIJK 2.0'
