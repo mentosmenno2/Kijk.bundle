@@ -88,22 +88,22 @@ def MediaObjectsForURL(url):
 			raise Ex.MediaNotAvailable
 	else:
 		Log("This video will be played as Stream")
-		#try:
-		for s in sources:
-			if(s["container"] == "M2TS"):
-				videoUrl = s["src"]
-				streams = createStreamList(videoUrl)
-				for stream in streams:
-					mo.append(MediaObject(
-						parts = [
-							PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url=stream["url"], url=stream["url"])))
-						],
-						audio_channels = 2,
-						video_resolution = stream["width"],
-						optimized_for_streaming = True
-					))
-		#except:
-		#	raise Ex.MediaNotAvailable
+		try:
+			for s in sources:
+				if(s["container"] == "M2TS"):
+					videoUrl = s["src"]
+					streams = createStreamList(videoUrl)
+					for stream in streams:
+						mo.append(MediaObject(
+							parts = [
+								PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url=stream["url"], url=stream["url"])))
+							],
+							audio_channels = 2,
+							video_resolution = stream["width"],
+							optimized_for_streaming = True
+						))
+		except:
+			raise Ex.MediaNotAvailable
 	if len(mo) > 0:
 		return mo
 	else:

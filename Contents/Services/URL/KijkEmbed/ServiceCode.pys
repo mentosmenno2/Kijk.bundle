@@ -52,10 +52,10 @@ def MetadataObjectForURL(url):
 def MediaObjectsForURL(url):
 	mo = []
 
-	try:
-		json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
-	except:
-		raise Ex.MediaNotAvailable
+	#try:
+	json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
+	#except:
+	#	raise Ex.MediaNotAvailable
 
 	try:
 		videoUrl = json_obj["playlist"]
