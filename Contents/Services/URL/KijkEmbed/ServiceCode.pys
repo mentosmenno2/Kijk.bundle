@@ -1,3 +1,5 @@
+import re
+
 VIDEO_URL = "https://embed.kijk.nl/api/video/"
 VIDEO_URL_AFTER = "?id=kijkapp"
 
@@ -46,19 +48,8 @@ def MetadataObjectForURL(url):
 
 	####################################################################################################
 def MediaObjectsForURL(url):
-	return [
-		MediaObject(
-			parts = [
-				PartObject(key=Callback(PlayVideo, url=url, url=url))
-			],
-			audio_channels = 2,
-			optimized_for_streaming = True
-		)
-	]
+	mo = []
 
-####################################################################################################
-@indirect
-def PlayVideo(url, **kwargs):
 	try:
 		json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
 	except:
@@ -66,8 +57,31 @@ def PlayVideo(url, **kwargs):
 
 	try:
 		videoUrl = json_obj["playlist"]
-		return IndirectResponse(VideoClipObject, key=videoUrl)
 	except:
+		raise Ex.MediaNotAvailable
+
+	streams = createStreamList(videoUrl)
+	for stream in streams:
+		mo.append(MediaObject(
+			parts = [
+				PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url=stream["url"], url=stream["url"])))
+			],
+			audio_channels = 2,
+			video_resolution = stream["width"],
+			optimized_for_streaming = True
+		))
+
+	if len(mo) > 0:
+		return mo
+	else:
+		raise Ex.MediaNotAvailable
+
+####################################################################################################
+@indirect
+def PlayVideo(url, **kwargs):
+	if url != "" and createStreamList(url):
+		return IndirectResponse(VideoClipObject, key=url)
+	else:
 		raise Ex.MediaNotAvailable
 
 ####################################################################################################
@@ -80,3 +94,22 @@ def getUrl(url):
 	return newUrl
 
 ####################################################################################################
+def createStreamList(url):
+	root_url = url.rsplit('/', 1)[0]
+	headers = {}
+	playlist = HTTP.Request(url, headers=headers, cacheTime=0).content
+	streams = []
+	playlistLines = playlist.splitlines()
+	for lineIndex, line in enumerate(playlistLines):
+		if line.startswith('#EXT-X-KEY:METHOD=AES-128'):
+			break
+		if not line.startswith('#'):
+			dataLine = playlistLines[lineIndex - 1]
+			try:
+				width = int(re.search('RESOLUTION=([0-9]+)x', dataLine).group(1))
+			except:
+				width = None
+			stream = {'width': width, 'url': root_url + '/' + line}
+			streams.append(stream)
+	Log(streams)
+	return streams

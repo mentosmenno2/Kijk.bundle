@@ -1,3 +1,5 @@
+import re
+
 VIDEO_URL = "https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/"
 VIDEOFILE_URL = "https://vod-bc-prod-1.sbscdn.nl/"
 
@@ -54,22 +56,7 @@ def MetadataObjectForURL(url):
 
 	####################################################################################################
 def MediaObjectsForURL(url):
-	return [
-		MediaObject(
-			parts = [
-				PartObject(key=Callback(PlayVideo, url=url, url=url))
-			],
-			# container = Container.MP4,
-			# video_codec = VideoCodec.H264,
-			# audio_codec = AudioCodec.AAC,
-			audio_channels = 2,
-			optimized_for_streaming = True
-		)
-	]
-
-####################################################################################################
-@indirect
-def PlayVideo(url, **kwargs):
+	mo = []
 	try:
 		json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
 		sources = json_obj["sources"]
@@ -78,14 +65,23 @@ def PlayVideo(url, **kwargs):
 	videoUrl = ""
 	if onlyMP4():
 		Log("This video will be played as MP4")
-		previousBitrate = 0
 		try:
 			for s in sources:
-				if(s["container"] == "MP4" and s["avg_bitrate"] > previousBitrate):
+				if(s["container"] == "MP4"):
 					videoUrl = s["stream_name"].replace("mp4:", '')
 					if not videoUrl.startswith(VIDEOFILE_URL):
 						videoUrl = VIDEOFILE_URL+videoUrl
-					previousBitrate = s["avg_bitrate"]
+					mo.append(MediaObject(
+						parts = [
+							PartObject(key=Callback(PlayVideo, url=videoUrl, url=videoUrl))
+						],
+						container = Container.MP4,
+						video_codec = VideoCodec.H264,
+						audio_codec = AudioCodec.AAC,
+						audio_channels = 2,
+						video_resolution = s["width"],
+						optimized_for_streaming = True
+					))
 		except:
 			raise Ex.MediaNotAvailable
 	else:
@@ -94,10 +90,28 @@ def PlayVideo(url, **kwargs):
 			for s in sources:
 				if(s["container"] == "M2TS"):
 					videoUrl = s["src"]
+					streams = createStreamList(videoUrl)
+					for stream in streams:
+						mo.append(MediaObject(
+							parts = [
+								PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url=stream["url"], url=stream["url"])))
+							],
+							audio_channels = 2,
+							video_resolution = stream["width"],
+							optimized_for_streaming = True
+						))
 		except:
 			raise Ex.MediaNotAvailable
-	if videoUrl != "":
-		return IndirectResponse(VideoClipObject, key=videoUrl)
+	if len(mo) > 0:
+		return mo
+	else:
+		raise Ex.MediaNotAvailable
+
+####################################################################################################
+@indirect
+def PlayVideo(url, **kwargs):
+	if url != "" and createStreamList(url):
+		return IndirectResponse(VideoClipObject, key=url)
 	else:
 		raise Ex.MediaNotAvailable
 
@@ -114,3 +128,24 @@ def onlyMP4():
 	if Client.Platform == 'Samsung': #Samsung smart tv
 		onlymp4 = True
 	return onlymp4
+
+####################################################################################################
+def createStreamList(url):
+	root_url = url.rsplit('/', 1)[0]
+	headers = {}
+	playlist = HTTP.Request(url, headers=headers, cacheTime=0).content
+	streams = []
+	playlistLines = playlist.splitlines()
+	for lineIndex, line in enumerate(playlistLines):
+		if line.startswith('#EXT-X-KEY:METHOD=AES-128'):
+			break
+		if not line.startswith('#'):
+			dataLine = playlistLines[lineIndex - 1]
+			try:
+				width = int(re.search('RESOLUTION=([0-9]+)x', dataLine).group(1))
+			except:
+				width = None
+			stream = {'width': width, 'url': root_url + '/' + line}
+			streams.append(stream)
+	Log(streams)
+	return streams

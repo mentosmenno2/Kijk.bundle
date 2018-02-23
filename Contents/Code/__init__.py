@@ -42,8 +42,8 @@ API_URL_V1 = 'https://api.kijk.nl/v1/'
 API_URL_V2 = 'https://api.kijk.nl/v2/'
 
 RE_SERIES = 'http://kijk.nl/(.*?)/(.*?)'
-KIJKEMBED_VIDEO_URL = "https://embed.kijk.nl/api/video/"
-BRIGHTCOVE_VIDEO_URL = "https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/"
+KIJKEMBED_API_URL = "https://embed.kijk.nl/api/video/"
+BRIGHTCOVE_API_URL = "https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/"
 
 
 ####################################################################################################
@@ -155,8 +155,8 @@ def MissedEpisodesList(title2='', path=''):
 		if not available:
 			continue
 
-		try: newPath = BRIGHTCOVE_VIDEO_URL+e["brightcoveId"]
-		except: newPath = KIJKEMBED_VIDEO_URL+e["id"]
+		try: newPath = BRIGHTCOVE_API_URL+e["brightcoveId"]
+		except: newPath = KIJKEMBED_API_URL+e["id"]
 
 		try: title = e["title"]
 		except: title = ''
@@ -227,8 +227,8 @@ def PopularList(title2=''):
 		if not available:
 			continue
 
-		try: newPath = BRIGHTCOVE_VIDEO_URL+e["brightcoveId"]
-		except: newPath = KIJKEMBED_VIDEO_URL+e["id"]
+		try: newPath = BRIGHTCOVE_API_URL+e["brightcoveId"]
+		except: newPath = KIJKEMBED_API_URL+e["id"]
 
 		try: title = e["title"]
 		except: title = ''
@@ -370,8 +370,8 @@ def EpisodeList(title2='', path='', art=R(ART)):
 				if not available:
 					continue
 
-				try: newPath = BRIGHTCOVE_VIDEO_URL+e["brightcoveId"]
-				except: newPath = KIJKEMBED_VIDEO_URL+e["id"]
+				try: newPath = BRIGHTCOVE_API_URL+e["brightcoveId"]
+				except: newPath = KIJKEMBED_API_URL+e["id"]
 
 				try: seasonLabelShort = e["seasonLabelShort"]
 				except: seasonLabelShort = ''
@@ -444,8 +444,8 @@ def EpisodeList(title2='', path='', art=R(ART)):
 							if not available:
 								continue
 
-							try: newPath = BRIGHTCOVE_VIDEO_URL+e["brightcoveId"]
-							except: newPath = KIJKEMBED_VIDEO_URL+e["id"]
+							try: newPath = BRIGHTCOVE_API_URL+e["brightcoveId"]
+							except: newPath = KIJKEMBED_API_URL+e["id"]
 
 							try: seasonLabelShort = e["seasonLabelShort"]
 							except: seasonLabelShort = ''
@@ -537,8 +537,8 @@ def Search(title2='', query=''):
 
 			for episode in episodes:
 
-				try: newPath = BRIGHTCOVE_VIDEO_URL+episode["brightcoveId"]
-				except: newPath = KIJKEMBED_VIDEO_URL+episode["id"]
+				try: newPath = BRIGHTCOVE_API_URL+episode["brightcoveId"]
+				except: newPath = KIJKEMBED_API_URL+episode["id"]
 
 				try: title = episode["title"]+": "+episode["subtitle"]
 				except: title = ''
