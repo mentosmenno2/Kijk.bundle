@@ -1,6 +1,6 @@
 import re
-import urllib2
-import ssl
+import requests
+import json
 
 VIDEO_URL = "https://embed.kijk.nl/api/video/"
 VIDEO_URL_AFTER = "?id=kijkapp"
@@ -53,7 +53,8 @@ def MediaObjectsForURL(url):
 	mo = []
 
 	#try:
-	json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
+	#json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
+	json_obj = json.loads(requests.get(url).content)
 	#except:
 	#	raise Ex.MediaNotAvailable
 

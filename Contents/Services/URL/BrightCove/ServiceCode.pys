@@ -60,7 +60,7 @@ def MetadataObjectForURL(url):
 def MediaObjectsForURL(url):
 	mo = []
 	try:
-		json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
+		json_obj = json.loads(requests.get(url).content)
 		sources = json_obj["sources"]
 	except:
 		raise Ex.MediaNotAvailable
