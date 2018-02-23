@@ -1,4 +1,6 @@
 import re
+import urllib2
+import ssl
 
 VIDEO_URL = "https://embed.kijk.nl/api/video/"
 VIDEO_URL_AFTER = "?id=kijkapp"

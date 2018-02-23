@@ -1,4 +1,6 @@
 import re
+import urllib2
+import ssl
 
 VIDEO_URL = "https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/"
 VIDEOFILE_URL = "https://vod-bc-prod-1.sbscdn.nl/"
