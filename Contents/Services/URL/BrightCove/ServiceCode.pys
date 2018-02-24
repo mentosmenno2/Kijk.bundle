@@ -110,7 +110,9 @@ def MediaObjectsForURL(url):
 ####################################################################################################
 @indirect
 def PlayVideo(url, **kwargs):
-	if url != "" and createStreamList(url):
+	if url.endswith('.mp4'):
+		return IndirectResponse(VideoClipObject, key=url)
+	if url.endswith('.m3u8') and createStreamList(url):
 		return IndirectResponse(VideoClipObject, key=url)
 	else:
 		raise Ex.MediaNotAvailable
