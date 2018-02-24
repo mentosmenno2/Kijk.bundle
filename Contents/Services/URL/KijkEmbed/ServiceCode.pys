@@ -52,14 +52,12 @@ def MetadataObjectForURL(url):
 	####################################################################################################
 def MediaObjectsForURL(url):
 	mo = []
-	Log(url)
-	#try:
-	#json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
-	gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-	jsonString = urllib2.urlopen(url, context=gcontext).read()
-	json_obj = json.loads(jsonString)
-	#except:
-	#	raise Ex.MediaNotAvailable
+	try:
+		gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+		jsonString = urllib2.urlopen(url, context=gcontext).read()
+		json_obj = json.loads(jsonString)
+	except:
+		raise Ex.MediaNotAvailable
 
 	try:
 		videoUrl = json_obj["playlist"]

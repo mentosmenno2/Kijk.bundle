@@ -66,7 +66,6 @@ def MediaObjectsForURL(url):
 		raise Ex.MediaNotAvailable
 	videoUrl = ""
 	if onlyMP4():
-		Log("This video will be played as MP4")
 		try:
 			for s in sources:
 				if(s["container"] == "MP4"):
@@ -87,7 +86,6 @@ def MediaObjectsForURL(url):
 		except:
 			raise Ex.MediaNotAvailable
 	else:
-		Log("This video will be played as Stream")
 		try:
 			for s in sources:
 				if(s["container"] == "M2TS"):
@@ -150,5 +148,4 @@ def createStreamList(url):
 				width = None
 			stream = {'width': width, 'url': root_url + '/' + line}
 			streams.append(stream)
-	Log(streams)
 	return streams
