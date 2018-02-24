@@ -53,7 +53,7 @@ def MediaObjectsForURL(url):
 	mo = []
 	Log(url)
 	#try:
-		json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
+	json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
 	#except:
 	#	raise Ex.MediaNotAvailable
 
