@@ -81,7 +81,7 @@ def MediaObjectsForURL(url):
 						audio_codec = AudioCodec.AAC,
 						audio_channels = 2,
 						video_resolution = s["width"],
-						optimized_for_streaming = True
+						optimized_for_streaming = isOptimizedForStreaming()
 					))
 		except:
 			raise Ex.MediaNotAvailable
@@ -98,7 +98,7 @@ def MediaObjectsForURL(url):
 							],
 							audio_channels = 2,
 							video_resolution = stream["width"],
-							optimized_for_streaming = True
+							optimized_for_streaming = isOptimizedForStreaming()
 						))
 		except:
 			raise Ex.MediaNotAvailable
@@ -151,3 +151,10 @@ def createStreamList(url):
 			stream = {'width': width, 'url': root_url + '/' + line}
 			streams.append(stream)
 	return streams
+
+####################################################################################################
+def isOptimizedForStreaming:
+	optimized = True
+	if Client.Platform == 'Samsung': #Samsung smart tv
+		optimized = False
+	return optimized
