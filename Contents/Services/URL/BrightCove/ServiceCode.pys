@@ -58,6 +58,8 @@ def MetadataObjectForURL(url):
 
 	####################################################################################################
 def MediaObjectsForURL(url):
+	Log("FORCE_BEST_QUALITY")
+	Log(Prefs["FORCE_BEST_QUALITY"])
 	mo = []
 	try:
 		json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
@@ -90,25 +92,25 @@ def MediaObjectsForURL(url):
 		except:
 			raise Ex.MediaNotAvailable
 	else:
-		#try:
-		for s in sources:
-			if(s["container"] == "M2TS"):
-				videoUrl = s["src"]
-				streams = createStreamList(videoUrl)
-				for stream in streams:
-					if Prefs["FORCE_BEST_QUALITY"] and stream["width"] > prevBestWidth:
-						mo = []
-						prevBestWidth = stream["width"]
-					mo.append(MediaObject(
-						parts = [
-							PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url=stream["url"], url=stream["url"])))
-						],
-						audio_channels = 2,
-						video_resolution = stream["width"],
-						optimized_for_streaming = isOptimizedForStreaming()
-					))
-		#except:
-		#	raise Ex.MediaNotAvailable
+		try:
+			for s in sources:
+				if(s["container"] == "M2TS"):
+					videoUrl = s["src"]
+					streams = createStreamList(videoUrl)
+					for stream in streams:
+						if Prefs["FORCE_BEST_QUALITY"] and stream["width"] > prevBestWidth:
+							mo = []
+							prevBestWidth = stream["width"]
+						mo.append(MediaObject(
+							parts = [
+								PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url=stream["url"], url=stream["url"])))
+							],
+							audio_channels = 2,
+							video_resolution = stream["width"],
+							optimized_for_streaming = isOptimizedForStreaming()
+						))
+		except:
+			raise Ex.MediaNotAvailable
 	if len(mo) > 0:
 		return mo
 	else:

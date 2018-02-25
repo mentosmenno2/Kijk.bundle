@@ -1,8 +1,0 @@
-[
-  {
-    "id": "FORCE_BEST_QUALITY",
-    "label": "Force best quality",
-    "type": "bool",
-    "default": "false"
-  }
-]
