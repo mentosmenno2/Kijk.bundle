@@ -8,7 +8,7 @@
 		<dict>
 			<key>URLPatterns</key>
 			<array>
-				<string>^http(s)?:\/\/(www\.)?(embed\.)?kijk\.nl\/api\/video\/.*</string>
+				<string>^http(s)?:\/\/(www\.)?(embed\.)?kijk\.nl\/api\/video\/.+</string>
 			</array>
 		</dict>
 		<key>BrightCove</key>

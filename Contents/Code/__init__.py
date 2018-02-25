@@ -68,7 +68,6 @@ def Start():
 ####################################################################################################
 @handler(PREFIX, NAME, thumb=ICON, art=ART)
 def MainMenu():
-
 	oc = ObjectContainer()
 
 	oc.add(DirectoryObject(
@@ -97,6 +96,11 @@ def MainMenu():
 		art = R(ART),
 		prompt = L("SEARCH_PROMPT"),
 		key = Callback(Search, title2=L("SEARCH"))
+	))
+	oc.add(PrefsObject(
+		title = L("SETTINGS"),
+		thumb = R(ICON),
+		art = R(ART)
 	))
 
 	return oc

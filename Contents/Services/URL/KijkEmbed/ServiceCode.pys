@@ -64,8 +64,12 @@ def MediaObjectsForURL(url):
 	except:
 		raise Ex.MediaNotAvailable
 
+	prevBestWidth = 0
 	streams = createStreamList(videoUrl)
 	for stream in streams:
+		if Prefs["FORCE_BEST_QUALITY"] and stream["width"] > prevBestWidth:
+			mo = []
+			prevBestWidth = stream["width"]
 		mo.append(MediaObject(
 			parts = [
 				PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url=stream["url"], url=stream["url"])))
@@ -119,7 +123,7 @@ def createStreamList(url):
 	return streams
 
 ####################################################################################################
-def isOptimizedForStreaming:
+def isOptimizedForStreaming():
 	optimized = True
 	if Client.Platform == 'Samsung': #Samsung smart tv
 		optimized = False
