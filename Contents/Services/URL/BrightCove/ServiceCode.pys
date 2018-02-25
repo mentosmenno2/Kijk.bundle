@@ -58,8 +58,6 @@ def MetadataObjectForURL(url):
 
 	####################################################################################################
 def MediaObjectsForURL(url):
-	Log("FORCE_BEST_QUALITY")
-	Log(Prefs["FORCE_BEST_QUALITY"])
 	mo = []
 	try:
 		json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
