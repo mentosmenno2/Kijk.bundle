@@ -212,7 +212,7 @@ def PopularList(title2=''):
 	oc = ObjectContainer(title2=title2, art=R(ART))
 
 	try:
-		jsonObj = getFromAPI2(path='default/sections/popular_PopularVODs?limit=999&offset=0')
+		jsonObj = getFromAPI2(path='default/sections/popular_PopularVODs?limit=20&offset=0')
 	except:
 		return errorMessage(L("ERROR_EPISODES_RETREIVING"))
 
