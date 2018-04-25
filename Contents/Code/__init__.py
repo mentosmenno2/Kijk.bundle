@@ -284,52 +284,68 @@ def ProgramsList(title2=''):
 	oc = ObjectContainer(title2=title2, art=R(ART))
 
 	try:
-		jsonObj = getFromAPI(path='default/sections/programs-abc-'+DIGS+AZ_LOWER+'?limit=999&offset=0')
+		jsonObj = getFromAPI2(path='templates/page/abc')
 	except:
 		return errorMessage(L("ERROR_PROGRAMS_RETREIVING"))
 
 	try:
-		elements = jsonObj["items"]
+		components = jsonObj["components"]
 	except:
-		return errorMessage(L("ERROR_PROGRAMS_NO_RESULTS"))
+		return errorMessage(L("ERROR_PROGRAMS_RETREIVING"))
 
-	for e in elements:
-		try: available = e["available"]
-		except: available = False
+	for comp in components:
+		try: objType = comp["type"]
+		except: objType = ''
+		if objType == "letter_programs_list":
+			pageProgList = comp["data"]["items"]
 
-		if onlyMP4() and "brightcoveId" not in e:
-			available = False
+			for programslist in pageProgList:
+				try: objType = programslist["type"]
+				except: objType = ''
+				if objType == "letter_programs":
 
-		if not available:
-			continue
+					letters = programslist["data"]["items"]
+					for letter in letters:
+						Log(letter["data"]["title"])
+						elements = letter["data"]["items"]
 
-		try: title = e["title"]
-		except: title = ''
+						for e in elements:
+							try: available = e["available"]
+							except: available = False
 
-		try: summary = e["synopsis"]
-		except: summary = ''
+							# if onlyMP4() and "brightcoveId" not in e:
+							# 	available = False
 
-		try: thumbUrl = e["images"]["nonretina_image"]
-		except: thumbUrl = ''
+							if not available:
+								continue
 
-		try: artUrl = e["images"]["nonretina_image_pdp_header"]
-		except: artUrl = ''
+							try: title = e["title"]
+							except: title = ''
 
-		thumb = Resource.ContentsOfURLWithFallback(thumbUrl, R(ICON))
+							try: summary = e["synopsis"]
+							except: summary = ''
 
-		art = Resource.ContentsOfURLWithFallback(artUrl, R(ART))
+							try: thumbUrl = e["images"]["nonretina_image"]
+							except: thumbUrl = ''
 
-		try: millis = int(e["duration"].replace(' min.', ''))*60*1000
-		except: millis = 0
+							try: artUrl = e["images"]["nonretina_image_pdp_header"]
+							except: artUrl = ''
 
-		oc.add(DirectoryObject(
-			title = title,
-			thumb = thumb,
-			summary = summary,
-			art = art,
-			duration = millis,
-			key = Callback(EpisodeList, title2=title, path=e["_links"]["self"], art=art)
-		))
+							thumb = Resource.ContentsOfURLWithFallback(thumbUrl, R(ICON))
+
+							art = Resource.ContentsOfURLWithFallback(artUrl, R(ART))
+
+							try: millis = int(e["duration"].replace(' min.', ''))*60*1000
+							except: millis = 0
+
+							oc.add(DirectoryObject(
+								title = title,
+								thumb = thumb,
+								summary = summary,
+								art = art,
+								duration = millis,
+								key = Callback(EpisodeList, title2=title, path=e["_links"]["self"], art=art)
+							))
 
 	oc.objects.sort(key = lambda obj: obj.title.lower())
 	if len(oc) > 0:
