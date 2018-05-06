@@ -4,11 +4,11 @@ Welcome! This plugin is a tool to watch missed episodes from the Dutch TV channe
 
 ## Installation
 
-There are multiple ways to insrall.
+There are multiple ways to install.
 
 Method 1: Unofficial App Store
 1. Make sure you have the [Unofficial App Store](https://github.com/ukdtom/WebTools.bundle) installed.
-2. In the "Plug-In fron url field, enter this repo url.
+2. In the 'Plug-In from url' field, enter this repo url.
 3. Press the 'Manual Installation' button next to the input field, and let the magic happen.
 
 Method 2: Git clone
