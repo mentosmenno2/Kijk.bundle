@@ -57,7 +57,7 @@ def MediaObjectsForURL(url):
 		jsonString = urllib2.urlopen(getUrl(url), context=gcontext).read()
 		json_obj = json.loads(jsonString)
 	except:
-		raise Ex.MediaNotAvailable
+		return mo
 
 	try:
 		videoUrl = json_obj["playlist"]

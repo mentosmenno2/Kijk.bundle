@@ -63,7 +63,7 @@ def MediaObjectsForURL(url):
 		json_obj = JSON.ObjectFromURL(getUrl(url), headers=HTTP_HEADERS, cacheTime=0)
 		sources = json_obj["sources"]
 	except:
-		raise Ex.MediaNotAvailable
+		return mo
 
 	prevBestWidth = 0
 	if onlyMP4():
