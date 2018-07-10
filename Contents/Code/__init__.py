@@ -306,7 +306,6 @@ def ProgramsList(title2=''):
 
 					letters = programslist["data"]["items"]
 					for letter in letters:
-						Log(letter["data"]["title"])
 						elements = letter["data"]["items"]
 
 						for e in elements:

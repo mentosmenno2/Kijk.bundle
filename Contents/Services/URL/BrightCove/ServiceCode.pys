@@ -67,8 +67,8 @@ def MediaObjectsForURL(url):
 
 	prevBestWidth = 0
 	if onlyMP4():
-		try:
-			for s in sources:
+		for s in sources:
+			try:
 				if(s["container"] == "MP4"):
 					videoUrl = s["stream_name"].replace("mp4:", '')
 					if not videoUrl.startswith(VIDEOFILE_URL):
@@ -87,16 +87,16 @@ def MediaObjectsForURL(url):
 						video_resolution = s["width"],
 						optimized_for_streaming = isOptimizedForStreaming()
 					))
-		except:
-			raise Ex.MediaNotAvailable
+			except:
+				pass
 	else:
-		try:
-			for s in sources:
+		for s in sources:
+			try:
 				if(s["container"] == "M2TS"):
 					videoUrl = s["src"]
 					streams = createStreamList(videoUrl)
 					for stream in streams:
-						if Prefs["FORCE_BEST_QUALITY"] and stream["width"] > prevBestWidth:
+						if Prefs["FORCE_BEST_QUALITY"] and stream["width"] is not None and stream["width"] > prevBestWidth:
 							mo = []
 							prevBestWidth = stream["width"]
 						mo.append(MediaObject(
@@ -107,8 +107,8 @@ def MediaObjectsForURL(url):
 							video_resolution = stream["width"],
 							optimized_for_streaming = isOptimizedForStreaming()
 						))
-		except:
-			raise Ex.MediaNotAvailable
+			except:
+				pass
 	if len(mo) > 0:
 		return mo
 	else:

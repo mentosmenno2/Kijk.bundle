@@ -54,7 +54,7 @@ def MediaObjectsForURL(url):
 	mo = []
 	try:
 		gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-		jsonString = urllib2.urlopen(url, context=gcontext).read()
+		jsonString = urllib2.urlopen(getUrl(url), context=gcontext).read()
 		json_obj = json.loads(jsonString)
 	except:
 		raise Ex.MediaNotAvailable
@@ -90,7 +90,7 @@ def PlayVideo(url, **kwargs):
 	if url != "" and createStreamList(url):
 		return IndirectResponse(VideoClipObject, key=url)
 	else:
-		raise Ex.MediaNotAvailable
+		raise Ex.MediaGeoblocked
 
 ####################################################################################################
 def getUrl(url):
@@ -103,11 +103,14 @@ def getUrl(url):
 
 ####################################################################################################
 def createStreamList(url):
-	root_url = url.rsplit('/', 1)[0]
+	#root_url = url.rsplit('/', 1)[0]
 	headers = {}
 	gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-	playlist = urllib2.urlopen(url, context=gcontext).read()
 	streams = []
+	try:
+		playlist = urllib2.urlopen(url, context=gcontext).read()
+	except:
+		return streams
 	playlistLines = playlist.splitlines()
 	for lineIndex, line in enumerate(playlistLines):
 		if line.startswith('#EXT-X-KEY:METHOD=AES-128'):
@@ -118,7 +121,7 @@ def createStreamList(url):
 				width = int(re.search('RESOLUTION=([0-9]+)x', dataLine).group(1))
 			except:
 				width = None
-			stream = {'width': width, 'url': root_url + '/' + line}
+			stream = {'width': width, 'url': line}
 			streams.append(stream)
 	return streams
 
