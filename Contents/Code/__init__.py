@@ -283,15 +283,15 @@ def ProgramsList(title2=''):
 
 	oc = ObjectContainer(title2=title2, art=R(ART))
 
-	try:
-		jsonObj = getFromAPI2(path='templates/page/abc')
-	except:
-		return errorMessage(L("ERROR_PROGRAMS_RETREIVING"))
+	#try:
+	jsonObj = getFromAPI2(path='templates/page/abc')
+	#except:
+	#	return errorMessage(L("ERROR_PROGRAMS_RETREIVING"))
 
-	try:
-		components = jsonObj["components"]
-	except:
-		return errorMessage(L("ERROR_PROGRAMS_RETREIVING"))
+	#try:
+	components = jsonObj["components"]
+	#except:
+	#	return errorMessage(L("ERROR_PROGRAMS_RETREIVING"))
 
 	for comp in components:
 		try: objType = comp["type"]
