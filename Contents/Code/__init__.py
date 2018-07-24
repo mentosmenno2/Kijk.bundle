@@ -3,6 +3,8 @@ import json
 import urllib
 import urllib2
 import ssl
+import certifi
+import requests
 import datetime
 
 NAME   = 'KIJK 2.0'
@@ -593,20 +595,18 @@ def Search(title2='', query=''):
 def getFromAPI(path=''):
 	Log("GetAPIV1Result")
 	Log(API_URL_V1+path)
-	gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-	receivedJson = urllib2.urlopen(API_URL_V1+path, context=gcontext).read()
+	receivedJson = requests.get(API_URL_V1+path, headers=HTTP.Headers, verify=certifi.where())
 	Log(receivedJson)
-	jsonObj = json.loads(receivedJson)
+	jsonObj = receivedJson.json()
 	return jsonObj
 
 @indirect
 def getSearchResult(path=''):
 	Log("GetSearchResult")
 	Log(API_URL_V1+path)
-	gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-	receivedJson = urllib2.urlopen(API_URL_V1+path, context=gcontext).read()
+	receivedJson = requests.get(API_URL_V2+path, headers=HTTP.Headers, verify=certifi.where())
 	Log(receivedJson)
-	receivedJson = "{\"results\": "+receivedJson+"}"
+	receivedJson = "{\"results\": "+receivedJson.text+"}"
 	jsonObj = json.loads(receivedJson)
 	return jsonObj
 
@@ -615,10 +615,9 @@ def getSearchResult(path=''):
 def getFromAPI2(path=''):
 	Log("GetAPIV2Result")
 	Log(API_URL_V2+path)
-	gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-	receivedJson = urllib2.urlopen(API_URL_V2+path, context=gcontext).read()
+	receivedJson = requests.get(API_URL_V2+path, headers=HTTP.Headers, verify=certifi.where())
 	Log(receivedJson)
-	jsonObj = json.loads(receivedJson)
+	jsonObj = receivedJson.json()
 	return jsonObj
 
 ####################################################################################################
