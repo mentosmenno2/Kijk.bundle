@@ -48,6 +48,8 @@ RE_SERIES = 'http://kijk.nl/(.*?)/(.*?)'
 KIJKEMBED_API_URL = "https://embed.kijk.nl/api/video/"
 BRIGHTCOVE_API_URL = "https://edge.api.brightcove.com/playback/v1/accounts/585049245001/videos/"
 
+PROGRAMS_LIMIT = 20
+EPISODES_LIMIT = 20
 
 ####################################################################################################
 def Start():
@@ -232,7 +234,7 @@ def PopularEpisodes(title2=''):
 		return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
 	for ei, e in enumerate(elements):
-		if ei == 20:
+		if ei == EPISODES_LIMIT:
 			break
 
 		try: available = e["available"]
@@ -308,7 +310,7 @@ def PopularPrograms(title2=''):
 		return errorMessage(L("ERROR_PROGRAMS_NO_RESULTS"))
 
 	for e in elements:
-		if len(shown) == 20:
+		if len(shown) == PROGRAMS_LIMIT:
 			break
 
 		try: id = e["id"]
@@ -440,6 +442,7 @@ def ProgramsList(title2=''):
 def EpisodeList(title2='', path='', art=R(ART)):
 
 	oc = ObjectContainer(title2=title2, art=art)
+	shown = [];
 
 	try:
 		jsonObj = getFromAPI(path=path)
@@ -462,6 +465,13 @@ def EpisodeList(title2='', path='', art=R(ART)):
 				return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
 			for e in elements:
+				if len(shown) == EPISODES_LIMIT:
+					break
+
+				try: id = e["id"]
+				except: id = ''
+				shown.append(id)
+
 				try: available = e["available"]
 				except: available = False
 
@@ -536,6 +546,13 @@ def EpisodeList(title2='', path='', art=R(ART)):
 							continue
 
 						for e in elements:
+							if len(shown) == PROGRAMS_LIMIT:
+								break
+
+							try: id = e["id"]
+							except: id = ''
+							shown.append(id)
+
 							try: available = e["available"]
 							except: available = False
 
