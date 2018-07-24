@@ -591,12 +591,12 @@ def Search(title2='', query=''):
 ####################################################################################################
 @indirect
 def getFromAPI(path=''):
-	#receivedJson = urllib.urlopen(API_URL_V1+path).read()
-	#jsonObj = json.loads(receivedJson)
-	#return jsonObj
-	jsonObj = JSON.ObjectFromURL(API_URL_V1+path)
-	Log("GetfromApi test")
-	Log(jsonObj)
+	Log("GetAPIV1Result")
+	Log(API_URL_V1+path)
+	gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+	receivedJson = urllib2.urlopen(API_URL_V1+path, context=gcontext).read()
+	Log(receivedJson)
+	jsonObj = json.loads(receivedJson)
 	return jsonObj
 
 @indirect
@@ -613,12 +613,12 @@ def getSearchResult(path=''):
 ####################################################################################################
 @indirect
 def getFromAPI2(path=''):
-	#receivedJson = urllib.urlopen(API_URL_V1+path).read()
-	#jsonObj = json.loads(receivedJson)
-	#return jsonObj
-	jsonObj = JSON.ObjectFromURL(API_URL_V2+path)
-	Log("GetfromApi test")
-	Log(jsonObj)
+	Log("GetAPIV2Result")
+	Log(API_URL_V2+path)
+	gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+	receivedJson = urllib2.urlopen(API_URL_V2+path, context=gcontext).read()
+	Log(receivedJson)
+	jsonObj = json.loads(receivedJson)
 	return jsonObj
 
 ####################################################################################################
