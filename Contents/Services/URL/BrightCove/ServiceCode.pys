@@ -112,7 +112,7 @@ def MediaObjectsForURL(url):
 	if len(mo) > 0:
 		return mo
 	else:
-		raise Ex.MediaNotAvailable
+		return mo
 
 ####################################################################################################
 @indirect
