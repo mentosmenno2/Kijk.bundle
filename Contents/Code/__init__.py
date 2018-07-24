@@ -32,7 +32,8 @@ CHANNELS = [
 ]
 
 ICON_MISSED = 'missed.png'
-ICON_POPULAR = 'popular.png'
+ICON_POPULAR_EPISODES = 'popular_episodes.png'
+ICON_POPULAR_PROGRAMS = 'popular_programs.png'
 ICON_PROGRAMS = 'programs.png'
 ICON_SEARCH = 'search.png'
 
@@ -81,10 +82,17 @@ def MainMenu():
 	))
 	oc.add(DirectoryObject(
 		title = L("POPULAR_EPISODES"),
-		thumb = R(ICON_POPULAR),
+		thumb = R(ICON_POPULAR_EPISODES),
 		art = R(ART),
-		key = Callback(PopularList, title2=L("POPULAR_EPISODES"))
+		key = Callback(PopularEpisodes, title2=L("POPULAR_EPISODES"))
 		#https://api.kijk.nl/v2/default/sections/popular_PopularVODs
+	))
+	oc.add(DirectoryObject(
+		title = L("POPULAR_PROGRAMS"),
+		thumb = R(ICON_POPULAR_PROGRAMS),
+		art = R(ART),
+		key = Callback(PopularPrograms, title2=L("POPULAR_PROGRAMS"))
+		#https://api.kijk.nl/v2/default/sections/popular_PopularFormats
 	))
 	oc.add(DirectoryObject(
 		title = L("PROGRAMS_LIST"),
@@ -208,8 +216,8 @@ def MissedEpisodesList(title2='', path=''):
 
 ####################################################################################################
 @indirect
-@route(PREFIX + '/popularList')
-def PopularList(title2=''):
+@route(PREFIX + '/popularEpisodes')
+def PopularEpisodes(title2=''):
 
 	oc = ObjectContainer(title2=title2, art=R(ART))
 
@@ -223,7 +231,10 @@ def PopularList(title2=''):
 	except:
 		return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
 
-	for e in elements:
+	for ei, e in enumerate(elements):
+		if ei == 20:
+			break
+
 		try: available = e["available"]
 		except: available = False
 
@@ -277,6 +288,75 @@ def PopularList(title2=''):
 		return oc
 	else:
 		return errorMessage(L("ERROR_EPISODES_NO_RESULTS"))
+
+####################################################################################################
+@indirect
+@route(PREFIX + '/popularPrograms')
+def PopularPrograms(title2=''):
+
+	oc = ObjectContainer(title2=title2, art=R(ART))
+	shown = [];
+
+	try:
+		jsonObj = getFromAPI2(path='default/sections/popular_PopularFormats?offset=0')
+	except:
+		return errorMessage(L("ERROR_PROGRAMS_RETREIVING"))
+
+	try:
+		elements = jsonObj["items"]
+	except:
+		return errorMessage(L("ERROR_PROGRAMS_NO_RESULTS"))
+
+	for e in elements:
+		if len(shown) == 20:
+			break
+
+		try: id = e["id"]
+		except: id = ''
+
+		if id in shown:
+			continue
+		shown.append(id)
+
+		try: available = e["available"]
+		except: available = False
+
+		if not available:
+			continue
+
+		try: title = e["title"]
+		except: title = ''
+
+		try: summary = e["synopsis"]
+		except: summary = ''
+
+		try: thumbUrl = e["images"]["nonretina_image"]
+		except: thumbUrl = ''
+
+		try: artUrl = e["images"]["nonretina_image_pdp_header"]
+		except: artUrl = ''
+
+		thumb = Resource.ContentsOfURLWithFallback(thumbUrl, R(ICON))
+
+		art = Resource.ContentsOfURLWithFallback(artUrl, R(ART))
+
+		try: millis = int(e["duration"].replace(' min.', ''))*60*1000
+		except: millis = 0
+
+		oc.add(DirectoryObject(
+			title = title,
+			thumb = thumb,
+			summary = summary,
+			art = art,
+			duration = millis,
+			key = Callback(EpisodeList, title2=title, path=e["_links"]["self"], art=art)
+		))
+
+	if len(oc) > 0:
+		return oc
+	else:
+		return errorMessage(L("ERROR_PROGRAMS_NO_RESULTS"))
+
 
 ####################################################################################################
 @indirect
