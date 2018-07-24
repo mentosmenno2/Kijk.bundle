@@ -594,7 +594,10 @@ def getFromAPI(path=''):
 	#receivedJson = urllib.urlopen(API_URL_V1+path).read()
 	#jsonObj = json.loads(receivedJson)
 	#return jsonObj
-	return JSON.ObjectFromURL(API_URL_V1+path)
+	jsonObj = JSON.ObjectFromURL(API_URL_V1+path)
+	Log("GetfromApi test")
+	Log(jsonObj)
+	return jsonObj
 
 @indirect
 def getSearchResult(path=''):
@@ -613,7 +616,10 @@ def getFromAPI2(path=''):
 	#receivedJson = urllib.urlopen(API_URL_V1+path).read()
 	#jsonObj = json.loads(receivedJson)
 	#return jsonObj
-	return JSON.ObjectFromURL(API_URL_V2+path)
+	jsonObj = JSON.ObjectFromURL(API_URL_V2+path)
+	Log("GetfromApi test")
+	Log(jsonObj)
+	return jsonObj
 
 ####################################################################################################
 def onlyMP4():
